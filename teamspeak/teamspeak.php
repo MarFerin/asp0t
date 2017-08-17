@@ -62,7 +62,7 @@
 					$.ajax({
 						type: "POST",
 						url: "/ajax.php",
-						dataType: "html",
+						dataType: "json",
 						data: {deleteTeamspeak:sendJson},
 						success: function(data) {
 							$('#managetsdiv > #'+port).remove();
@@ -74,9 +74,14 @@
 					$.ajax({
 						type: "POST",
 						url: "/ajax.php",
-						dataType: "html",
+						dataType: "json",
 						data: {resetTeamspeak:sendJson},
 						success: function(data) {
+							$('#'+port).detach().appendTo("#managetsdiv");
+							$(document).scrollTop($(document).height());
+							var token = data["Token"];
+							$('#url-to-copy').val(token);
+							copyURL();
 						}
 					});
 				}
@@ -94,7 +99,7 @@
 								$('#managetsdiv').append('<table id="'+data[i].Port+'" style="align-items: center; vertical-align: middle; border-bottom:1px solid #525252"><tr><td style="vertical-align: middle"><table class="serverList" onclick="viewTeamspeak(this)"><tr><td class="serverName">'+
 									data[i].Name+'</td><td style="width: 3rem">'+data[i].Port+'</td><td style="width: 4rem">'+
 									data[i].Online+'/'+data[i].Slots+'</td><td class="serverSubdomain">'+
-									data[i].Subdomain[0]+'</td></tr></table></td><td><a href=ts3server://104.46.51.203:"'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
+									data[i].Subdomain[0]+'</td></tr></table></td><td><a href="ts3server://52.233.128.182:'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
 									'<a href="#" class="tool icon fa-pencil"></a>'+
 									'<a onclick="deletets('+data[i].Port+')" style="color: red" class="tool icon fa-trash"></a>'+
 									'<a onclick="resetts('+data[i].Port+')" class="tool icon fa-refresh"></a>'+'</td></tr></table>');
@@ -292,6 +297,7 @@
 					}
 				}
 			</script>
+			<input type="text" id="url-to-copy" value="" style="display: none"/>
 	</head>
 	<body>
 		<!-- Wrapper -->
@@ -461,7 +467,6 @@
 											<div class="bubbles" id="b4"></div>
 											<div class="bubbles" id="b5"></div>
 										</div>
-										<input type="text" id="url-to-copy" value="" style="display: none"/>
 										<button class="button icon fa-clipboard" id="Connection" onclick="copyURL()" style="display: none;margin-right:1rem"></button>
 										
 										

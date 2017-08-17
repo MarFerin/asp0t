@@ -43,6 +43,7 @@ if (isset($_POST['updateTSDNS'])) {
 if (isset($_POST['manageTeamspeaks'])) {
     $receiveData = $_POST['manageTeamspeaks'];
     if($receiveData["Passkey"]=="aspot_89"){
+        //deleteInactive();
         $inipath = "/home/ts3srv/tsdns/tsdns_settings.ini";
         $config_array  = parse_ini_file($inipath);
         $ts3_ServerInstance = TeamSpeak3::factory($query);
@@ -65,16 +66,16 @@ if (isset($_POST['manageTeamspeaks'])) {
 if (isset($_POST['deleteTeamspeak'])) {
     $receiveData = $_POST['deleteTeamspeak'];
     if($receiveData["Passkey"]=="aspot_89"){
-        //deleteTeamspeak($receiveData["Port"]);
+        deleteTeamspeak($receiveData["Port"]);
+        echo '{"Error":"0"}';
     }
-    //deleteInactive();
 }
 if (isset($_POST['resetTeamspeak'])) {
     $receiveData = $_POST['resetTeamspeak'];
     if($receiveData["Passkey"]=="aspot_89"){
-        //deleteTeamspeak($receiveData["Port"]);
+        $token = resetTeamspeak($receiveData["Port"]);
+        echo '{"Error":"0","Token":"'.$token.'"}';
     }
-    //deleteInactive();
 }
 if (isset($_POST['checkActivity'])) {
     $receiveData = $_POST['deleteTeamspeak'];
@@ -169,7 +170,7 @@ function checkIfValid($subdomain, $domain){
     $inipath = "/home/ts3srv/tsdns/tsdns_settings.ini";
     $config_array  = parse_ini_file($inipath);
     foreach($config_array as $key => $value){
-        if($key==$subdomain.$domain){
+        if($key==strtolower($subdomain).$domain){
             return false;
         }
     }
@@ -277,7 +278,6 @@ function createTeamspeak($teamspeakData) {
     if(!is_numeric($teamspeakData["Slots"]) || $teamspeakData["Slots"]>500){
         return '{"Error":"5","Response":"Too many slots"}';
     }
-//deleteInactive();
     $ts3_ServerInstance = TeamSpeak3::factory($query);
     $ts3_ServerInstance->setPredefinedQueryName("server");
     $numberOfServers = count($ts3_ServerInstance);
