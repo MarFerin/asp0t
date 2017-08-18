@@ -57,6 +57,28 @@
 						success: function(data) {
 							$('#managetsdiv').empty();
 							$('#managetsdiv').append(data);
+							$('table.client').click(function() {
+								elemId = this.id;
+								$('#managetsdiv').empty();
+								$(this).appendTo("#managetsdiv");
+								clid = parseInt(elemId.substr(elemId.indexOf("cl")+2));
+								sid = parseInt(elemId.substr(7,elemId.indexOf("_cl")-7));
+								getClientInfo(sid,clid);
+							})
+						}
+					});
+				}
+				function getClientInfo(sid,clid){
+					var sendJson = {"sid":sid, "clid":clid, "Passkey":sensitivePass};
+					$.ajax({
+						type: "POST",
+						url: "/ajax.php",
+						dataType: "json",
+						data: {getClientInfo:sendJson},
+						success: function(data) {
+							//for(i = 0;i<data[])
+							//$('#managetsdiv').append('<input type="checkbox" id="client-permissions" name="client-permissions">'+
+							//'<label for="client-permissions">Enable Client Permissions</label>'
 						}
 					});
 				}

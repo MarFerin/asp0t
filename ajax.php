@@ -89,6 +89,26 @@ if (isset($_POST['viewTeamspeak'])) {
     if($receiveData["Passkey"]=="aspot_89"){
         $ts3_VirtualServer = TeamSpeak3::factory($query."?server_port=".$receiveData["Port"]);
         echo $ts3_VirtualServer->getViewer(new TeamSpeak3_Viewer_Html("/images/viewericons/", "/images/countryflags/", "data:image"));
+        $ts3_VirtualServer->logout();
+    }
+}
+if (isset($_POST['getClientInfo'])) {
+    $receiveData = $_POST['getClientInfo'];
+    if($receiveData["Passkey"]=="aspot_89"){
+        $ts3_ServerInstance = TeamSpeak3::factory($query);
+        $ts3_VirtualServer = $ts3_ServerInstance->serverGetById($receiveData["sid"]);
+        $ts3_Client = $ts3_VirtualServer->clientGetById($receiveData["clid"]);
+        $clientGroups = $ts3_Client->memberOf();
+        foreach($clientGroups as $clientGroup){
+            $clientServerGroups[] = $clientGroup->__toString();
+        }
+        $response["Client Groups"] = $clientServerGroups;
+        $allServerGroups = $ts3_VirtualServer->serverGroupList();
+        foreach($allServerGroups as $serverGroup){
+            $serverGroups[] = $serverGroup->__toString();
+        }
+        $response["All Groups"] = $serverGroups;
+        echo json_encode($response);
     }
 }
 if (isset($_POST['createAccount'])) {

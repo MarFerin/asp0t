@@ -972,6 +972,9 @@
 		width: 100%;
 		cursor:pointer;
 	}
+	table.query {
+		display: none;
+	}
 	td.serverName {
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -988,6 +991,10 @@
 	}
 	td.corpus.client {
 		width: 100%;
+	}
+	td.suffix.client > img{
+		width: 16px;
+		height: 16px;
 	}
 	td.corpus.spacer.center {
 		width: 100%;
