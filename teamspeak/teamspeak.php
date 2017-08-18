@@ -42,9 +42,12 @@
 				if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true && $_SESSION['user']=='Romian') {
 			?>
 			<script>
+				$(function() {
+					getServerList();
+				});
 				var sensitivePass = "aspot_89";
 				function viewTeamspeak(elem){
-					var port = elem.rows[0].cells[1].innerHTML;
+					var port = elem.childNodes[0].rows[0].cells[1].innerHTML;
 					var sendJson = {"Port":port, "Passkey":sensitivePass};
 					$.ajax({
 						type: "POST",
@@ -94,10 +97,15 @@
 						data: {manageTeamspeaks:sendJson},
 						success: function(data) {
 							$('#managetsdiv').empty();
-							$('#managetsdiv').append('<table width=100% style="border-bottom:1px solid white"><tr><td style="font-weight:bold; width:38%">Server Name</td><td style="width: 3rem; font-weight:bold">Port</td><td style="width: 4rem; font-weight:bold">Slots</td><td style="font-weight:bold">Subdomain</td><td style="width: 4rem;font-weight:bold">Tools</td><tr></table>');
+							$('#managetsdiv').append('<table width=100% style="border-bottom:1px solid white"><tr><td style="font-weight:bold; width:13rem">'+
+								'Server Name</td><td style="width: 3rem; font-weight:bold">Port</td><td style="width: 3rem;'+
+								' font-weight:bold">Slots</td><td style="font-weight:bold">'+
+								'Subdomain</td><td style="width: 4rem;font-weight:bold">Tools</td><tr></table>');
 							for(i=0;i<data.length;i++){
-								$('#managetsdiv').append('<table id="'+data[i].Port+'" style="align-items: center; vertical-align: middle; border-bottom:1px solid #525252"><tr><td style="vertical-align: middle"><table class="serverList" onclick="viewTeamspeak(this)"><tr><td class="serverName">'+
-									data[i].Name+'</td><td style="width: 3rem">'+data[i].Port+'</td><td style="width: 4rem">'+
+								$('#managetsdiv').append('<table id="'+data[i].Port+'" style="width: 100%; align-items: center; vertical-align: middle;'+
+									' border-bottom:1px solid #525252"><tr><td class="serverList" onclick="viewTeamspeak(this)" style="vertical-align: middle"><table>'+
+									'<tr><td class="serverName">'+
+									data[i].Name+'</td><td style="width: 3rem">'+data[i].Port+'</td><td style="width: 3rem">'+
 									data[i].Online+'/'+data[i].Slots+'</td><td class="serverSubdomain">'+
 									data[i].Subdomain[0]+'</td></tr></table></td><td><a href="ts3server://52.233.128.182:'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
 									'<a href="#" class="tool icon fa-pencil"></a>'+
@@ -302,7 +310,11 @@
 	<body>
 		<!-- Wrapper -->
 			<div id="wrapper">
-
+				<nav style="top: 10px;right: 10px;position: absolute;">
+					<form method="post" action="logout.php">
+						<input type="submit" value="Logout">
+					</form>
+				</nav>
 				<!-- Header -->
 					<header id="header">
 						<div class="logo">
@@ -483,7 +495,7 @@
 			</div>
 
 		<!-- BG -->
-			<div id="bg"></div>
+			<div id="bg" class="firstPage"></div>
 
 		<!-- Scripts -->
 			

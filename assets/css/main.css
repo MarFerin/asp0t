@@ -957,13 +957,20 @@
 		-webkit-overflow-scrolling: touch;
 		overflow-x: auto;
 	}
-	table.serverList:hover { 
-    	background-color: grey;
+	td.serverList:hover { 
+    	background-color: #121212;
 	}
-	table.serverList {
+	td.serverList {
 		cursor:pointer;
 		height: 100%;
 		vertical-align: middle;
+	}
+	table.client:hover { 
+    	background-color: #121212;
+	}
+	table.client {
+		width: 100%;
+		cursor:pointer;
 	}
 	td.serverName {
 		overflow: hidden;
@@ -979,7 +986,13 @@
 		width: 10rem;
 		max-width: 10rem;
 	}
-
+	td.corpus.client {
+		width: 100%;
+	}
+	td.corpus.spacer.center {
+		width: 100%;
+		text-align: center;
+	}
 	table.alt {
 		margin: 0 0 2rem 0;
 		width: 100%;
@@ -1170,14 +1183,10 @@
 		}
 
 		#bg:before {
-			-moz-transition: background-color 2.5s ease-in-out;
-			-webkit-transition: background-color 2.5s ease-in-out;
-			-ms-transition: background-color 2.5s ease-in-out;
-			transition: background-color 2.5s ease-in-out;
-			-moz-transition-delay: 0.75s;
-			-webkit-transition-delay: 0.75s;
-			-ms-transition-delay: 0.75s;
-			transition-delay: 0.75s;
+			-moz-transition: background-color 0.5s ease-in-out;
+			-webkit-transition: background-color 0.5s ease-in-out;
+			-ms-transition: background-color 0.5s ease-in-out;
+			transition: background-color 0.5s ease-in-out;
 			background-image: linear-gradient(to top, rgba(19, 21, 25, 0.5), rgba(19, 21, 25, 0.5)), url("../../images/overlay.png");
 			background-size: auto, 256px 256px;
 			background-position: center, center;
@@ -1212,7 +1221,7 @@
 			filter: blur(0.2rem);
 		}
 
-		body.is-loading #bg:before {
+		body.is-loading .firstPage:before {
 			background-color: #000000;
 		}
 
