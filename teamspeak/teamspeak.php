@@ -81,25 +81,23 @@
 						dataType: "json",
 						data: {getClientInfo:sendJson},
 						success: function(data) {
-							$('#managetsdiv').append('<div id="info" class="field half first"></div>');
-							$('#info').append('<h3>Client Info</h3>');
-							$('#info').append('<label style="margin-bottom: 0px;">Version:</label>');
-							$('#info').append('<p>'+data["Version"]+'</p>');
-							$('#info').append('<label style="margin-bottom: 0px;">Online since:</label>');
-							$('#info').append('<p>'+data["Online Since"]+'</p>');
-							$('#info').append('<label style="margin-bottom: 0px;">Idle Time:</label>');
-							$('#info').append('<p>'+data["Idle Time"]+'</p>');
-							$('#managetsdiv').append('<div id="serverGroups" class="field half"></div>');
-							$('#serverGroups').append('<h3>Server Groups</h3>');
+							$('#managetsdiv').append('<div id="serverGroups" class="field half first"></div>');
 							for(i = 0;i<data["All Groups"].length;i++){
 								$('#serverGroups').append('<input type="checkbox" id="sg'+data["All Groups"][i].replace(/\s/g, '')+'" name="sg'+
 								data["All Groups"][i].replace(/\s/g, '')+'">'+
-								'<label style="width:100%" for="sg'+data["All Groups"][i].replace(/\s/g, '')+'"><img src="'+data["Icons"][i]+
-								'" style="vertical-align: middle; width: 16px; height: 16px"> '+data["All Groups"][i]+'</label>');
+								'<label style="width:100%" for="sg'+data["All Groups"][i].replace(/\s/g, '')+'">'+(data["Icons"][i]==null?'':('<img src="'+data["Icons"][i]+
+								'" style="vertical-align: middle; width: 16px; height: 16px"> '))+data["All Groups"][i]+'</label>');
 							}
 							for(i = 1;i<data["Client Groups"].length;i++){
 								$('#sg'+data["Client Groups"][i].replace(/\s/g, '')).prop('checked', true);
 							}
+							$('#managetsdiv').append('<div id="info" class="field half"></div>');
+							$('#info').append('<label style="margin-bottom: 0px;">Version:</label>');
+							$('#info').append('<p style="margin: 0 0 1.2rem 0">'+data["Version"]+'</p>');
+							$('#info').append('<label style="margin-bottom: 0px;">Online since:</label>');
+							$('#info').append('<p style="margin: 0 0 1.2rem 0">'+data["Online Since"]+'</p>');
+							$('#info').append('<label style="margin-bottom: 0px;">Idle Time:</label>');
+							$('#info').append('<p style="margin: 0 0 1.2rem 0">'+data["Idle Time"]+'</p>');
 						}
 					});
 				}
