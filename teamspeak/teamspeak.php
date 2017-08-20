@@ -86,7 +86,7 @@
 							$('#info').append('<label style="margin-bottom: 0px;">Version:</label>');
 							$('#info').append('<p>'+data["Version"]+'</p>');
 							$('#info').append('<label style="margin-bottom: 0px;">Online since:</label>');
-							$('#info').append('<p>'+data["Version"]+'</p>');
+							$('#info').append('<p>'+data["Online Since"]+'</p>');
 							$('#info').append('<label style="margin-bottom: 0px;">Idle Time:</label>');
 							$('#info').append('<p>'+data["Idle Time"]+'</p>');
 							$('#managetsdiv').append('<div id="serverGroups" class="field half"></div>');
@@ -236,6 +236,10 @@
 									type: "success",
 									allowOutsideClick: true,
 									showConfirmButton: true
+								},
+								function(){
+									checkcurrentTSDNS();
+									checknewTSDNS();
 								});
 							}
 							else{

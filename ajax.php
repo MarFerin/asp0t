@@ -114,9 +114,12 @@ if (isset($_POST['getClientInfo'])) {
         $response["All Groups"] = $serverGroups;
         $response["Icons"] = $icons;
         $response["Version"] = TeamSpeak3_Helper_Convert::versionShort($ts3_Client->client_version) . " on " . $ts3_Client->client_platform;
-        $response["Idle Time"] = TeamSpeak3_Helper_Convert::seconds($ts3_Client->client_idle_time,true);
-        $response["Online Since"] = $ts3_Client->infoDb();
-        $response["Description"]=$ts3_Client->infoDb()->client_description;
+
+        $response["Idle Time"] = convertTime($ts3_Client->client_idle_time);
+        $response["Online Since"] = convertTime($ts3_Client->connection_connected_time);
+        $response["Description"]=$ts3_Client->client_description;
+        //$response["vardump"]=
+        //$response["printr"]=(string)print_r($ts3_Client);
         echo json_encode($response);
     }
 }
@@ -126,6 +129,27 @@ if (isset($_POST['createAccount'])) {
     //$sql = "INSERT INTO userinfo (firstname, lastname, email)
     //VALUES ('John', 'Doe', 'john@example.com')";
 
+}
+
+function convertTime($mstime){
+    $totalSeconds = $mstime/1000.0;
+    $days = floor($totalSeconds / 86400);
+    $hours = floor(($totalSeconds % 86400)/ 3600);
+    $minutes = floor((($totalSeconds % 86400) % 3600) / 60);
+    $seconds = floor($totalSeconds % 60);
+    if($days>0){
+        $stringTime = $days." days ".$hours." hours ".$minutes." minutes ".$seconds." seconds";
+    }
+    elseif($hours>0){
+        $stringTime = $hours." hours ".$minutes." minutes ".$seconds." seconds";
+    }
+    elseif($minutes>0){
+        $stringTime = $minutes." minutes ".$seconds." seconds";
+    }
+    else{
+        $stringTime = $seconds." seconds";
+    }
+    return $stringTime;
 }
 
 function addTSDNS($subdomain, $domain, $port) {
