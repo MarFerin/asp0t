@@ -18,7 +18,10 @@
     // Checks to see if the username and password have been entered.
     // If so and are equal to the username and password defined above, log them in.
     if (isset($_POST['username']) && isset($_POST['password'])) {
-        if ($accounts[$_POST['username']] == $_POST['password']) {
+		if($accounts[$_POST['username']]==''){
+			$_SESSION['loggedIn'] = false;
+            $error = "Invalid username and password!";
+		} elseif ($accounts[$_POST['username']] == $_POST['password']) {
             $_SESSION['loggedIn'] = true;
 			$_SESSION['user'] = $_POST['username'];
             header('Location: teamspeak.php');

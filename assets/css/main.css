@@ -159,7 +159,6 @@
 		line-height: 1.5;
 		margin: 0 0 1rem 0;
 		text-transform: uppercase;
-		letter-spacing: 0.2rem;
 	}
 
 		h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
@@ -186,7 +185,6 @@
 	h2 {
 		font-size: 1.5rem;
 		line-height: 1.4;
-		letter-spacing: 0.5rem;
 	}
 
 	h3 {
@@ -285,17 +283,17 @@
 		margin: 0 0 1.5rem 0;
 	}
 
-		form .field {
+		.field {
 			margin: 0 0 1.5rem 0;
 		}
 
-			form .field.half {
+			.field.half {
 				width: 50%;
 				float: left;
 				padding: 0 0 0 0.75rem;
 			}
 
-				form .field.half.first {
+				.field.half.first {
 					padding: 0 0.75rem 0 0;
 				}
 
@@ -305,15 +303,15 @@
 
 		@media screen and (max-width: 736px) {
 
-			form .field {
+			.field {
 				margin: 0 0 1.125rem 0;
 			}
 
-				form .field.half {
+				.field.half {
 					padding: 0 0 0 0.5625rem;
 				}
 
-					form .field.half.first {
+					.field.half.first {
 						padding: 0 0.5625rem 0 0;
 					}
 
@@ -325,13 +323,13 @@
 
 		@media screen and (max-width: 480px) {
 
-			form .field.half {
+			.field.half {
 				width: 100%;
 				float: none;
 				padding: 0;
 			}
 
-				form .field.half.first {
+				.field.half.first {
 					padding: 0;
 				}
 
@@ -965,6 +963,9 @@
 		height: 100%;
 		vertical-align: middle;
 	}
+	td > img{
+		vertical-align: -1px;
+	}
 	table.client:hover { 
     	background-color: #121212;
 	}
@@ -1065,7 +1066,7 @@
 	input[type="submit"],
 	input[type="reset"],
 	input[type="button"],
-	button,
+	button:not(.confirm):not(.cancel),
 	.button {
 		-moz-appearance: none;
 		-webkit-appearance: none;
@@ -1082,6 +1083,7 @@
 		color: #ffffff !important;
 		cursor: pointer;
 		display: inline-block;
+		font: inherit;
 		font-size: 0.8rem;
 		font-weight: 300;
 		height: 2.75rem;
@@ -1137,6 +1139,10 @@
 			background-color: #ffffff;
 			color: #1b1f22 !important;
 			font-weight: 600;
+		}
+
+		button.copy:hover{
+			background-color: #3a3a3a !important;
 		}
 
 		input[type="submit"].disabled, input[type="submit"]:disabled,

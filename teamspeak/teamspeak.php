@@ -18,6 +18,8 @@
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
 		<noscript><link rel="stylesheet" href="http://agarspot.com/assets/css/noscript.css" /></noscript>
+		<link rel="stylesheet" type="text/css" href="http://agarspot.com/dist/sweetalert.css"/>
+		<script src="http://agarspot.com/dist/sweetalert.min.js"></script>
 		<script src="http://agarspot.com/assets/js/jquery.min.js"></script>
 			<script src="http://agarspot.com/assets/js/skel.min.js"></script>
 			<script src="http://agarspot.com/assets/js/util.js"></script>
@@ -60,6 +62,9 @@
 							$('table.client').click(function() {
 								elemId = this.id;
 								$('#managetsdiv').empty();
+								$(this).css({'margin-bottom': "1rem",'border-bottom': "solid grey 1px"});
+								$(this).removeClass("client");
+								$(this).children()[0].rows[0].cells[0].remove();
 								$(this).appendTo("#managetsdiv");
 								clid = parseInt(elemId.substr(elemId.indexOf("cl")+2));
 								sid = parseInt(elemId.substr(7,elemId.indexOf("_cl")-7));
@@ -76,38 +81,85 @@
 						dataType: "json",
 						data: {getClientInfo:sendJson},
 						success: function(data) {
-							//for(i = 0;i<data[])
-							//$('#managetsdiv').append('<input type="checkbox" id="client-permissions" name="client-permissions">'+
-							//'<label for="client-permissions">Enable Client Permissions</label>'
+							$('#managetsdiv').append('<div id="info" class="field half first"></div>');
+							$('#info').append('<h3>Client Info</h3>');
+							$('#info').append('<label style="margin-bottom: 0px;">Version:</label>');
+							$('#info').append('<p>'+data["Version"]+'</p>');
+							$('#info').append('<label style="margin-bottom: 0px;">Online since:</label>');
+							$('#info').append('<p>'+data["Version"]+'</p>');
+							$('#info').append('<label style="margin-bottom: 0px;">Idle Time:</label>');
+							$('#info').append('<p>'+data["Idle Time"]+'</p>');
+							$('#managetsdiv').append('<div id="serverGroups" class="field half"></div>');
+							$('#serverGroups').append('<h3>Server Groups</h3>');
+							for(i = 0;i<data["All Groups"].length;i++){
+								$('#serverGroups').append('<input type="checkbox" id="sg'+data["All Groups"][i].replace(/\s/g, '')+'" name="sg'+
+								data["All Groups"][i].replace(/\s/g, '')+'">'+
+								'<label style="width:100%" for="sg'+data["All Groups"][i].replace(/\s/g, '')+'"><img src="'+data["Icons"][i]+
+								'" style="vertical-align: middle; width: 16px; height: 16px"> '+data["All Groups"][i]+'</label>');
+							}
+							for(i = 1;i<data["Client Groups"].length;i++){
+								$('#sg'+data["Client Groups"][i].replace(/\s/g, '')).prop('checked', true);
+							}
 						}
 					});
 				}
 				function deletets(port){
-					var sendJson = {"Port":port, "Passkey":sensitivePass};
-					$.ajax({
-						type: "POST",
-						url: "/ajax.php",
-						dataType: "json",
-						data: {deleteTeamspeak:sendJson},
-						success: function(data) {
-							$('#managetsdiv > #'+port).remove();
-						}
+					swal({
+							title: "Are you sure?",
+							text: "You will not be able to recover this teamspeak!",
+							type: "warning",
+							showCancelButton: true,
+							confirmButtonColor: "#DD6B55",
+							confirmButtonText: "Yes, delete it!",
+							closeOnConfirm: true
+						},
+						function(){
+							var sendJson = {"Port":port, "Passkey":sensitivePass};
+							$.ajax({
+								type: "POST",
+								url: "/ajax.php",
+								dataType: "json",
+								data: {deleteTeamspeak:sendJson},
+								success: function(data) {
+									$('#managetsdiv > #'+port).remove();
+								}
+							});
 					});
 				}
 				function resetts(port){
-					var sendJson = {"Port":port, "Passkey":sensitivePass};
-					$.ajax({
-						type: "POST",
-						url: "/ajax.php",
-						dataType: "json",
-						data: {resetTeamspeak:sendJson},
-						success: function(data) {
-							$('#'+port).detach().appendTo("#managetsdiv");
-							$(document).scrollTop($(document).height());
-							var token = data["Token"];
-							$('#url-to-copy').val(token);
-							copyURL();
-						}
+					swal({
+						title: "Are you sure?",
+						text: "All data will be reset.",
+						type: "warning",
+						showCancelButton: true,
+						confirmButtonColor: "#DD6B55",
+						confirmButtonText: "Yes, reset it!",
+						closeOnConfirm: false
+					},
+					function(){
+						var sendJson = {"Port":port, "Passkey":sensitivePass};
+						$.ajax({
+							type: "POST",
+							url: "/ajax.php",
+							dataType: "json",
+							data: {resetTeamspeak:sendJson},
+							success: function(data) {
+								$('#'+port).detach().appendTo("#managetsdiv");
+								$(document).scrollTop($(document).height());
+								var token = data["Token"];
+								$('#url-to-copy').val(token);
+								swal({
+									title: "",
+									text: 'Key: <code style="font-size: 14px">'+token+'</code><button id="copyCode" class="button icon copy fa-clipboard" onclick="copyURL()" style="display:inline;font-size: 14px;padding: 0 0.5em 0 0.5em;margin: 0px"></button>',
+									html: true,
+									type: "success",
+									allowOutsideClick: true,
+									showConfirmButton: false
+								});
+								$("#copyCode")[0].onclick = null;
+								$("#copyCode").attr('onclick','copyURL()');
+							}
+						});
 					});
 				}
 				function getServerList(){
@@ -179,10 +231,20 @@
 						data: {updateTSDNS:sendJson},
 						success: function(data) {
 							if(data["Error"]==0){
-								checkTSDNS();
-								checkcurrentTSDNS();
+								swal({
+									title: "Domain has been changed!",
+									type: "success",
+									allowOutsideClick: true,
+									showConfirmButton: true
+								});
 							}
 							else{
+								swal({
+									title: "Something went wrong!",
+									type: "error",
+									allowOutsideClick: true,
+									showConfirmButton: true
+								});
 							}
 						}
 					});

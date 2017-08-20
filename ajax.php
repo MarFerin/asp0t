@@ -105,9 +105,18 @@ if (isset($_POST['getClientInfo'])) {
         $response["Client Groups"] = $clientServerGroups;
         $allServerGroups = $ts3_VirtualServer->serverGroupList();
         foreach($allServerGroups as $serverGroup){
-            $serverGroups[] = $serverGroup->__toString();
+            if($serverGroup->type == TeamSpeak3::GROUP_DBTYPE_REGULAR){
+                $serverGroups[] = $serverGroup->__toString();
+                $helperString = $serverGroup->iconDownload();
+                $icons[]=($helperString!=null?("data:".TeamSpeak3_Helper_Convert::imageMimeType($helperString).";base64,".$helperString->toBase64()):null);
+            }
         }
         $response["All Groups"] = $serverGroups;
+        $response["Icons"] = $icons;
+        $response["Version"] = TeamSpeak3_Helper_Convert::versionShort($ts3_Client->client_version) . " on " . $ts3_Client->client_platform;
+        $response["Idle Time"] = TeamSpeak3_Helper_Convert::seconds($ts3_Client->client_idle_time,true);
+        $response["Online Since"] = $ts3_Client->infoDb();
+        $response["Description"]=$ts3_Client->infoDb()->client_description;
         echo json_encode($response);
     }
 }
@@ -134,7 +143,7 @@ function updateTSDNS($receiveData){
     unset($config_array[strtolower($receiveData['cSubdomain']).getDomain($receiveData['cDomain'])]);
     write_php_ini($config_array,$inipath);
     $shell_output = shell_exec("sudo /home/ts3srv/tsdns/tsdnsserver --update");
-    return '{"ShellOutput":"'.$shell_output.'"}';
+    return '{"Error":"0","ShellOutput":"'.$shell_output.'"}';
 }
 function write_php_ini($array, $file){
     $res = array();
