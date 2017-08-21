@@ -43,7 +43,6 @@ if (isset($_POST['updateTSDNS'])) {
 if (isset($_POST['manageTeamspeaks'])) {
     $receiveData = $_POST['manageTeamspeaks'];
     if($receiveData["Passkey"]=="aspot_89"){
-        //deleteInactive();
         $inipath = "/home/ts3srv/tsdns/tsdns_settings.ini";
         $config_array  = parse_ini_file($inipath);
         $ts3_ServerInstance = TeamSpeak3::factory($query);
@@ -63,6 +62,13 @@ if (isset($_POST['manageTeamspeaks'])) {
         echo json_encode($listofservers);
     }
 }
+if(isset($_POST['deleteInactive'])) {
+    $receiveData = $_POST['deleteTeamspeak'];
+    if($receiveData["Passkey"]=="aspot_89"){
+        $count = deleteInactive();
+        echo '{"Error":"0","Count":"'.$count.'"}';
+    }
+}
 if (isset($_POST['deleteTeamspeak'])) {
     $receiveData = $_POST['deleteTeamspeak'];
     if($receiveData["Passkey"]=="aspot_89"){
@@ -75,13 +81,6 @@ if (isset($_POST['resetTeamspeak'])) {
     if($receiveData["Passkey"]=="aspot_89"){
         $token = resetTeamspeak($receiveData["Port"]);
         echo '{"Error":"0","Token":"'.$token.'"}';
-    }
-}
-if (isset($_POST['checkActivity'])) {
-    $receiveData = $_POST['deleteTeamspeak'];
-    if($receiveData["Passkey"]=="aspot_89"){
-        $returnData = checkActivity();
-        echo json_encode($returnData);
     }
 }
 if (isset($_POST['viewTeamspeak'])) {
@@ -262,6 +261,7 @@ function deleteInactive(){
     $inipath = "/home/ts3srv/tsdns/tsdns_settings.ini";
     $config_array  = parse_ini_file($inipath);
     $ts3_ServerInstance = TeamSpeak3::factory($query);
+    $count = count($inactiveServers);
     foreach($inactiveServers as $sid){
         $port = $ts3_ServerInstance->serverGetPortById($sid);
         $ts3_ServerInstance->serverStop($sid);
@@ -276,6 +276,7 @@ function deleteInactive(){
     write_php_ini($config_array,$inipath);
     shell_exec("sudo /home/ts3srv/tsdns/tsdnsserver --update");
     $ts3_ServerInstance->logout();
+    return $count;
 }
 function deleteTeamspeak($port) {
     global $query;

@@ -101,6 +101,23 @@
 						}
 					});
 				}
+				function deleteInactive(){
+					var sendJson = {"Passkey":sensitivePass};
+					$.ajax({
+						type: "POST",
+						url: "/ajax.php",
+						dataType: "json",
+						data: {deleteInactive:sendJson},
+						success: function(data) {
+							swal({
+								title: data["Count"]+"teamspeaks deleted.",
+								type: "success",
+								allowOutsideClick: true,
+								showConfirmButton: true
+							});
+						}
+					});
+				}
 				function deletets(port){
 					swal({
 							title: "Are you sure?",
@@ -181,7 +198,7 @@
 									data[i].Online+'/'+data[i].Slots+'</td><td class="serverSubdomain">'+
 									data[i].Subdomain[0]+'</td></tr></table></td><td><a href="ts3server://52.233.128.182:'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
 									'<a href="#" class="tool icon fa-pencil"></a>'+
-									'<a onclick="deletets('+data[i].Port+')" style="color: red" class="tool icon fa-trash"></a>'+
+									'<a onclick="deletets('+data[i].Port+')" class="tool icon fa-trash"></a>'+
 									'<a onclick="resetts('+data[i].Port+')" class="tool icon fa-refresh"></a>'+'</td></tr></table>');
 							}
 						}
@@ -424,6 +441,13 @@
 									}
 								?>
 								<li><a href="#teamspeak">Create Teamspeak</a></li>
+								<?php
+									if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true && $_SESSION['user']=='Romian') {
+								?>
+								<li><a href="#tools">Tools</a></li>
+								<?php
+									}
+								?>
 							</ul>
 						</nav>
 					</header>
@@ -460,7 +484,7 @@
 										</div>
 										<p id="ndnsError" class="errormessage"></p>
 									</div>
-									<button id="updatedns" class="special" onclick="updateDNS()" style="margin-right:1rem;margin-top:1rem">Update DNS</button>
+									<button id="updatedns" onclick="updateDNS()" style="margin-right:1rem;margin-top:1rem">Update DNS</button>
 								</article>
 
 							<!-- Account -->
@@ -482,7 +506,7 @@
 									<button id="createAccount" onclick="create()">Create Account</button>
 								</article>
 
-							<!-- Contact -->
+							<!-- Manage -->
 								<article id="managets">
 									<h2 class="major">Manage a Teamspeak</h2>
 									<div id="managetsdiv"></div>
@@ -557,7 +581,7 @@
 											<!--<input type="checkbox" id="server-logging" name="server-logging" checked>
 											<label for="server-logging">Enable Server Logging</label>-->
 										</form>
-										<button id="create" class="special" onclick="create()" style="margin-right:1rem">Create Server</button>
+										<button id="create" onclick="create()" style="margin-right:1rem">Create Server</button>
 										<div id="loading" class="bubbles-wrapper" style="display: none">
 											<div class="bubbles" id="b1"></div>
 											<div class="bubbles" id="b2"></div>
@@ -571,6 +595,15 @@
 									</section>
 								</article>  
 
+					
+					
+					
+							<!-- Tools -->
+								<article id="tools">
+									<h2 class="major">Tools</h2>
+									<button onclick="deleteInactive()">Delete Inactive</button>
+									<button onclick="runAjaxQuery()">Run Query</button>
+								</article>
 					</div>
 
 				<!-- Footer -->

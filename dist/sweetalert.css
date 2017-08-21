@@ -183,7 +183,9 @@ body.stop-scrolling {
     border-radius: 5px;
     padding: 10px 32px;
     margin: 26px 5px 0 5px;
-    cursor: pointer; }
+    cursor: pointer;
+    height: auto !important;
+    letter-spacing: auto !important}
     .sweet-alert button:focus {
       outline: none;
       box-shadow: 0 0 2px rgba(128, 179, 235, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.05); }

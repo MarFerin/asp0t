@@ -823,6 +823,22 @@
 				a.tool {
 					margin-left: 6px;
 					cursor:pointer;
+					color:#FFFFFF;
+				}
+				a.tool:hover {
+					color:#CBCBCB;
+				}
+				a.tool:active {
+					color:#AAAAAA;
+				}
+				a.tool.fa-trash {
+					color:#FF0000;
+				}
+				a.tool.fa-trash:hover {
+					color:#D50000;
+				}
+				a.tool.fa-trash:active {
+					color:#A90000;
 				}
 
 					ul.icons li a:hover {
@@ -959,6 +975,9 @@
 	td.serverList:hover { 
     	background-color: #121212;
 	}
+	td.serverList:active {
+		background-color: #000000;
+	}
 	td.serverList {
 		cursor:pointer;
 		height: 100%;
@@ -969,6 +988,9 @@
 	}
 	table.client:hover { 
     	background-color: #121212;
+	}
+	table.client:active { 
+    	background-color: #000000;
 	}
 	table.client {
 		width: 100%;
@@ -1067,7 +1089,7 @@
 	input[type="submit"],
 	input[type="reset"],
 	input[type="button"],
-	button:not(.confirm):not(.cancel),
+	button,
 	.button {
 		-moz-appearance: none;
 		-webkit-appearance: none;
@@ -1142,8 +1164,14 @@
 			font-weight: 600;
 		}
 
+		button.copy{
+			background-color: transparent !important;
+		}
 		button.copy:hover{
-			background-color: #3a3a3a !important;
+			background-color: rgba(255, 255, 255, 0.075) !important;
+		}
+		button.copy:active{
+			background-color: rgba(255, 255, 255, 0.175) !important;
 		}
 
 		input[type="submit"].disabled, input[type="submit"]:disabled,
