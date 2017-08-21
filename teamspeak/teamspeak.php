@@ -57,6 +57,7 @@
 						dataType: "html",
 						data: {viewTeamspeak:sendJson},
 						success: function(data) {
+							$('#managets').children().last().remove();
 							$('#managetsdiv').empty();
 							$('#managetsdiv').append(data);
 							$('table.client').click(function() {
@@ -115,6 +116,28 @@
 								allowOutsideClick: true,
 								showConfirmButton: true
 							});
+						}
+					});
+				}
+				function editts(port){
+					var sendJson = {"Port":port, "Passkey":sensitivePass};
+					$.ajax({
+						type: "POST",
+						url: "/ajax.php",
+						dataType: "json",
+						data: {getTeamspeakData:sendJson},
+						success: function(data) {
+							$('#eserver-name').val(data["Name"]);
+							$('#eslots').val(data["Slots"]);
+							if(data["Subdomain"][0].includes(".agarspot.com")){
+								$('#eserver-subdomain').val(data["Subdomain"][0].substring(0,(data["Subdomain"][0].length-13)));
+								$('#edomain-name').val(1);
+							}
+							else{
+								$('#eserver-subdomain').val(data["Subdomain"][0].substring(0,(data["Subdomain"][0].length-11)));
+								$('#edomain-name').val(3);
+							}
+							window.location.href = '#editts';
 						}
 					});
 				}
@@ -197,7 +220,7 @@
 									data[i].Name+'</td><td style="width: 3rem">'+data[i].Port+'</td><td style="width: 3rem">'+
 									data[i].Online+'/'+data[i].Slots+'</td><td class="serverSubdomain">'+
 									data[i].Subdomain[0]+'</td></tr></table></td><td><a href="ts3server://52.233.128.182:'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
-									'<a href="#" class="tool icon fa-pencil"></a>'+
+									'<a onclick="editts('+data[i].Port+')" class="tool icon fa-pencil"></a>'+
 									'<a onclick="deletets('+data[i].Port+')" class="tool icon fa-trash"></a>'+
 									'<a onclick="resetts('+data[i].Port+')" class="tool icon fa-refresh"></a>'+'</td></tr></table>');
 							}
@@ -407,6 +430,27 @@
 						tmpElem.remove();
 					}
 				}
+				function isNumberKey(evt){
+					var charCode = (evt.which) ? evt.which : event.keyCode
+					if (charCode > 31 && (charCode < 48 || charCode > 57)){
+						evt.target.setCustomValidity("Invalid field.");
+						setTimeout(setValid, 400);
+						return false;
+					}
+					setValid();
+					return true;
+				}
+				function checkOverflow(evt){
+					if(parseInt(evt.target.value)>500){
+						evt.target.value = 500;
+						evt.target.setCustomValidity("Invalid field.");
+						setTimeout(setValid, 400);
+					}
+				}
+				function setValid(){
+					document.getElementById("slots").setCustomValidity("");
+					document.getElementById("eslots").setCustomValidity("");
+				}
 			</script>
 			<input type="text" id="url-to-copy" value="" style="display: none"/>
 	</head>
@@ -518,7 +562,7 @@
 
 									<section>
 										<h3>Create your own teamspeak</h3>
-										<form method="post" action="#">
+										<form>
 											<div class="field half first" style="margin-bottom:0px">
 												<label for="server-name">Server Name</label>
 												<input type="text" name="server-name" id="server-name" value="" placeholder="My Teamspeak Name" />
@@ -528,28 +572,6 @@
 												<label for="slots">Slots</label>
 												<input type="text" name="slots" id="slots" placeholder="Max 500" value="200" onkeyup="checkOverflow(event)" onkeypress="return isNumberKey(event)"/>
 												<p id="slotsError" class="errormessage"></p>
-												<script>
-													function isNumberKey(evt){
-	    												var charCode = (evt.which) ? evt.which : event.keyCode
-	    												if (charCode > 31 && (charCode < 48 || charCode > 57)){
-															evt.target.setCustomValidity("Invalid field.");
-															setTimeout(setValid, 400);
-	       													return false;
-														}
-														setValid();
-														return true;
-													}
-													function checkOverflow(evt){
-														if(parseInt(evt.target.value)>500){
-															evt.target.value = 500;
-															evt.target.setCustomValidity("Invalid field.");
-															setTimeout(setValid, 400);
-														}
-													}
-													function setValid(){
-														document.getElementById("slots").setCustomValidity("");
-													}
-												</script>
 											</div>
 											<label>Subdomian</label>
 											<div style="margin-bottom:0px">
@@ -558,7 +580,6 @@
 												<div class="sselect-wrapper" style="width:40%;display:inline">
 													<select name="domain-name" id="domain-name" style="width:40%;display:inline;padding:5px">
 														<option value="1">.agarspot.com</option>
-														<!--<option value="2">.tshub.io</option>-->
 														<option value="3">.ogarhub.io</option>
 													</select>
 												</div>
@@ -568,7 +589,6 @@
 											<div class="select-wrapper">
 												<select name="teamspeak-style" id="teamspeak-style">
 													<option value="1">Clan</option>
-													<!--<option value="2">Squad</option>-->
 													<option value="3">Blank Teamspeak</option>
 												</select>
 											</div>
@@ -578,8 +598,6 @@
 											<label for="client-permissions">Enable Client Permissions</label>
 											<input type="checkbox" id="channel-client-permissions" name="channel-client-permissions">
 											<label for="channel-client-permissions">Enable Channel-Client Permissions</label>
-											<!--<input type="checkbox" id="server-logging" name="server-logging" checked>
-											<label for="server-logging">Enable Server Logging</label>-->
 										</form>
 										<button id="create" onclick="create()" style="margin-right:1rem">Create Server</button>
 										<div id="loading" class="bubbles-wrapper" style="display: none">
@@ -595,6 +613,43 @@
 									</section>
 								</article>  
 
+							<!-- Teamspeak -->
+							<article id="editts">
+									<h2 class="major">Teamspeak</h2>
+
+									<div id="editteamspeak">
+										<h3>Edit your teamspeak</h3>
+										<form>
+											<div class="field half first" style="margin-bottom:0px">
+												<label for="eserver-name">Server Name</label>
+												<input type="text" name="eserver-name" id="eserver-name"/>
+												<p id="enameError" class="errormessage"></p>
+											</div>
+											<div class="field half" style="margin-bottom:0px">
+												<label for="eslots">Slots</label>
+												<input type="text" name="eslots" id="eslots" onkeyup="checkOverflow(event)" onkeypress="return isNumberKey(event)"/>
+												<p id="eslotsError" class="errormessage"></p>
+											</div>
+											<label>Subdomian</label>
+											<div style="margin-bottom:0px">
+												<input type="text" name="eserver-subdomain" id="eserver-subdomain" onkeyup="clearValidity()" onblur="checkTSDNS()" style="display: inline; text-align: right;
+														width: 20%; padding-right:5px;"/>
+												<div class="sselect-wrapper" style="width:40%;display:inline">
+													<select name="edomain-name" id="edomain-name" style="width:40%;display:inline;padding:5px">
+														<option value="1">.agarspot.com</option>
+														<option value="3">.ogarhub.io</option>
+													</select>
+												</div>
+												<p id="edomainError" class="errormessage"></p>
+											</div>
+											<label>Advanced Permissions</label>
+											<input type="checkbox" id="eclient-permissions" name="eclient-permissions">
+											<label for="eclient-permissions">Enable Client Permissions</label>
+											<input type="checkbox" id="echannel-client-permissions" name="echannel-client-permissions">
+											<label for="echannel-client-permissions">Enable Channel-Client Permissions</label>
+										</form>
+									</div>
+								</article>  
 					
 					
 					
