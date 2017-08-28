@@ -122,7 +122,7 @@
 							}
 
 						// Lock.
-							locked = true;
+							locked = false;
 
 					// Article already visible? Just swap articles.
 						if ($body.hasClass('is-article-visible')) {

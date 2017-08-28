@@ -46,6 +46,18 @@
 			<script>
 				$(function() {
 					getServerList();
+					$viewTsBack = $('#viewts').children().last();
+					$viewTsBack.click(function(){
+						location.hash = '#managets';
+					});
+					$viewTsBack.removeClass("close");
+					$viewTsBack.addClass("back");
+					$viewClientBack = $('#viewclient').children().last()
+					$viewClientBack.click(function(){
+						location.hash = '#viewts';
+					});
+					$viewClientBack.removeClass("close");
+					$viewClientBack.addClass("back");
 				});
 				var sensitivePass = "aspot_89";
 				function viewTeamspeak(elem){
@@ -57,20 +69,22 @@
 						dataType: "html",
 						data: {viewTeamspeak:sendJson},
 						success: function(data) {
-							$('#managets').children().last().remove();
-							$('#managetsdiv').empty();
-							$('#managetsdiv').append(data);
+							$('#viewtsdiv').empty();
+							$('#viewtsdiv').append(data);
 							$('table.client').click(function() {
 								elemId = this.id;
-								$('#managetsdiv').empty();
-								$(this).css({'margin-bottom': "1rem",'border-bottom': "solid grey 1px"});
-								$(this).removeClass("client");
-								$(this).children()[0].rows[0].cells[0].remove();
-								$(this).appendTo("#managetsdiv");
+								$('#viewclientdiv').empty();
+								var $clientTable = $(this).clone();
+								$clientTable.css({'margin-bottom': "1rem",'border-bottom': "solid grey 1px"});
+								$clientTable.removeClass("client");
+								$clientTable.children()[0].rows[0].cells[0].remove();
+								$clientTable.appendTo("#viewclientdiv");
 								clid = parseInt(elemId.substr(elemId.indexOf("cl")+2));
 								sid = parseInt(elemId.substr(7,elemId.indexOf("_cl")-7));
 								getClientInfo(sid,clid);
+								location.hash = '#viewclient';
 							})
+							location.hash = '#viewts';
 						}
 					});
 				}
@@ -82,7 +96,7 @@
 						dataType: "json",
 						data: {getClientInfo:sendJson},
 						success: function(data) {
-							$('#managetsdiv').append('<div id="serverGroups" class="field half first"></div>');
+							$('#viewclientdiv').append('<div id="serverGroups" class="field half first"></div>');
 							for(i = 0;i<data["All Groups"].length;i++){
 								$('#serverGroups').append('<input type="checkbox" id="sg'+data["All Groups"][i].replace(/\s/g, '')+'" name="sg'+
 								data["All Groups"][i].replace(/\s/g, '')+'">'+
@@ -92,7 +106,7 @@
 							for(i = 1;i<data["Client Groups"].length;i++){
 								$('#sg'+data["Client Groups"][i].replace(/\s/g, '')).prop('checked', true);
 							}
-							$('#managetsdiv').append('<div id="info" class="field half"></div>');
+							$('#viewclientdiv').append('<div id="info" class="field half"></div>');
 							$('#info').append('<label style="margin-bottom: 0px;">Version:</label>');
 							$('#info').append('<p style="margin: 0 0 1.2rem 0">'+data["Version"]+'</p>');
 							$('#info').append('<label style="margin-bottom: 0px;">Online since:</label>');
@@ -137,7 +151,7 @@
 								$('#eserver-subdomain').val(data["Subdomain"][0].substring(0,(data["Subdomain"][0].length-11)));
 								$('#edomain-name').val(3);
 							}
-							window.location.href = '#editts';
+							location.hash = '#editts';
 						}
 					});
 				}
@@ -219,7 +233,7 @@
 									'<tr><td class="serverName">'+
 									data[i].Name+'</td><td style="width: 3rem">'+data[i].Port+'</td><td style="width: 3rem">'+
 									data[i].Online+'/'+data[i].Slots+'</td><td class="serverSubdomain">'+
-									data[i].Subdomain[0]+'</td></tr></table></td><td><a href="ts3server://52.233.128.182:'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
+									data[i].Subdomain[0]+'</td></tr></table></td><td><a href="ts3server://23.100.0.11:'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
 									'<a onclick="editts('+data[i].Port+')" class="tool icon fa-pencil"></a>'+
 									'<a onclick="deletets('+data[i].Port+')" class="tool icon fa-trash"></a>'+
 									'<a onclick="resetts('+data[i].Port+')" class="tool icon fa-refresh"></a>'+'</td></tr></table>');
@@ -555,8 +569,17 @@
 									<h2 class="major">Manage a Teamspeak</h2>
 									<div id="managetsdiv"></div>
 								</article>
-
-							<!-- Teamspeak -->
+							<!-- View Teamspeak -->
+								<article id="viewts">
+									<h2 class="major">View Teamspeak</h2>
+									<div id="viewtsdiv"></div>
+								</article>
+							<!-- View Client -->
+								<article id="viewclient">
+									<h2 class="major">Client</h2>
+									<div id="viewclientdiv"></div>
+								</article>
+							<!--Create Teamspeak -->
 								<article id="teamspeak">
 									<h2 class="major">Teamspeak</h2>
 
@@ -613,43 +636,43 @@
 									</section>
 								</article>  
 
-							<!-- Teamspeak -->
-							<article id="editts">
-									<h2 class="major">Teamspeak</h2>
+							<!-- EditTs -->
+								<article id="editts">
+										<h2 class="major">Teamspeak</h2>
 
-									<div id="editteamspeak">
-										<h3>Edit your teamspeak</h3>
-										<form>
-											<div class="field half first" style="margin-bottom:0px">
-												<label for="eserver-name">Server Name</label>
-												<input type="text" name="eserver-name" id="eserver-name"/>
-												<p id="enameError" class="errormessage"></p>
-											</div>
-											<div class="field half" style="margin-bottom:0px">
-												<label for="eslots">Slots</label>
-												<input type="text" name="eslots" id="eslots" onkeyup="checkOverflow(event)" onkeypress="return isNumberKey(event)"/>
-												<p id="eslotsError" class="errormessage"></p>
-											</div>
-											<label>Subdomian</label>
-											<div style="margin-bottom:0px">
-												<input type="text" name="eserver-subdomain" id="eserver-subdomain" onkeyup="clearValidity()" onblur="checkTSDNS()" style="display: inline; text-align: right;
-														width: 20%; padding-right:5px;"/>
-												<div class="sselect-wrapper" style="width:40%;display:inline">
-													<select name="edomain-name" id="edomain-name" style="width:40%;display:inline;padding:5px">
-														<option value="1">.agarspot.com</option>
-														<option value="3">.ogarhub.io</option>
-													</select>
+										<div id="editteamspeak">
+											<h3>Edit your teamspeak</h3>
+											<form>
+												<div class="field half first" style="margin-bottom:0px">
+													<label for="eserver-name">Server Name</label>
+													<input type="text" name="eserver-name" id="eserver-name"/>
+													<p id="enameError" class="errormessage"></p>
 												</div>
-												<p id="edomainError" class="errormessage"></p>
-											</div>
-											<label>Advanced Permissions</label>
-											<input type="checkbox" id="eclient-permissions" name="eclient-permissions">
-											<label for="eclient-permissions">Enable Client Permissions</label>
-											<input type="checkbox" id="echannel-client-permissions" name="echannel-client-permissions">
-											<label for="echannel-client-permissions">Enable Channel-Client Permissions</label>
-										</form>
-									</div>
-								</article>  
+												<div class="field half" style="margin-bottom:0px">
+													<label for="eslots">Slots</label>
+													<input type="text" name="eslots" id="eslots" onkeyup="checkOverflow(event)" onkeypress="return isNumberKey(event)"/>
+													<p id="eslotsError" class="errormessage"></p>
+												</div>
+												<label>Subdomian</label>
+												<div style="margin-bottom:0px">
+													<input type="text" name="eserver-subdomain" id="eserver-subdomain" onkeyup="clearValidity()" onblur="checkTSDNS()" style="display: inline; text-align: right;
+															width: 20%; padding-right:5px;"/>
+													<div class="sselect-wrapper" style="width:40%;display:inline">
+														<select name="edomain-name" id="edomain-name" style="width:40%;display:inline;padding:5px">
+															<option value="1">.agarspot.com</option>
+															<option value="3">.ogarhub.io</option>
+														</select>
+													</div>
+													<p id="edomainError" class="errormessage"></p>
+												</div>
+												<label>Advanced Permissions</label>
+												<input type="checkbox" id="eclient-permissions" name="eclient-permissions">
+												<label for="eclient-permissions">Enable Client Permissions</label>
+												<input type="checkbox" id="echannel-client-permissions" name="echannel-client-permissions">
+												<label for="echannel-client-permissions">Enable Channel-Client Permissions</label>
+											</form>
+										</div>
+									</article>  
 					
 					
 					

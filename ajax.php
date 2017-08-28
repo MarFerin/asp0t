@@ -54,7 +54,7 @@ if (isset($_POST['manageTeamspeaks'])) {
             $serverPort = (string)$ts3_VirtualServer->virtualserver_port;
             $serverSlots = (string)$ts3_VirtualServer->virtualserver_maxclients;
             $serverClients = (string)$ts3_VirtualServer->clientCount();
-            $subdomain = array_keys($config_array, '52.233.128.182:'.$serverPort);
+            $subdomain = array_keys($config_array, '23.100.0.11:'.$serverPort);
             $listofservers[$serverID]=array("Name"=>$serverName,"Subdomain"=>$subdomain,"Port"=>$serverPort,"Online"=>$serverClients,"Slots"=>$serverSlots);
         }
         $ts3_ServerInstance->logout();
@@ -80,7 +80,7 @@ if (isset($_POST['getTeamspeakData'])) {
         $perms = $ts3_ServerGroup->permList(true);
         $clientPerms = array_key_exists("b_virtualserver_client_permission_list",$perms);
         $channelClientPerms = array_key_exists("b_virtualserver_channelclient_permission_list",$perms);
-        $subdomain = array_keys($config_array, '52.233.128.182:'.$receiveData["Port"]);
+        $subdomain = array_keys($config_array, '23.100.0.11:'.$receiveData["Port"]);
         echo json_encode(array("Name"=>(string)$ts3_VirtualServer->virtualserver_name,"Subdomain"=>$subdomain,
             "Slots"=>(string)$ts3_VirtualServer->virtualserver_maxclients,"clientPerms"=>$clientPerms,"channelClientPerms"=>$channelClientPerms));
     }
@@ -89,15 +89,15 @@ if (isset($_POST['getTeamspeakData'])) {
 if (isset($_POST['deleteTeamspeak'])) {
     $receiveData = $_POST['deleteTeamspeak'];
     if($receiveData["Passkey"]=="aspot_89"){
-        //deleteTeamspeak($receiveData["Port"]);
-        //echo '{"Error":"0"}';
+        deleteTeamspeak($receiveData["Port"]);
+        echo '{"Error":"0"}';
     }
 }
 if (isset($_POST['resetTeamspeak'])) {
     $receiveData = $_POST['resetTeamspeak'];
     if($receiveData["Passkey"]=="aspot_89"){
-        //$token = resetTeamspeak($receiveData["Port"]);
-        //echo '{"Error":"0","Token":"'.$token.'"}';
+        $token = resetTeamspeak($receiveData["Port"]);
+        echo '{"Error":"0","Token":"'.$token.'"}';
     }
 }
 if (isset($_POST['viewTeamspeak'])) {
@@ -171,7 +171,7 @@ function convertTime($mstime){
 function addTSDNS($subdomain, $domain, $port) {
     $inipath = "/home/ts3srv/tsdns/tsdns_settings.ini";
     $config_array  = parse_ini_file($inipath);
-    $config_array[strtolower($subdomain).$domain] = "52.233.128.182:".$port;
+    $config_array[strtolower($subdomain).$domain] = "23.100.0.11:".$port;
     write_php_ini($config_array,$inipath);
     $shell_output = shell_exec("sudo /home/ts3srv/tsdns/tsdnsserver --update");
     return '{"ShellOutput":"'.$shell_output.'"}';
@@ -283,7 +283,7 @@ function deleteInactive(){
         $port = $ts3_ServerInstance->serverGetPortById($sid);
         $ts3_ServerInstance->serverStop($sid);
         $ts3_ServerInstance->serverDelete($sid);
-        $subdomains = array_keys($config_array, '52.233.128.182:'.$port);
+        $subdomains = array_keys($config_array, '23.100.0.11:'.$port);
         if(count($subdomains)>0){
             foreach($subdomains as $subdomain){
                 unset($config_array[$subdomain]);
@@ -304,7 +304,7 @@ function deleteTeamspeak($port) {
     $ts3_ServerInstance->serverStop($sid);
     $ts3_ServerInstance->serverDelete($sid);
     $ts3_ServerInstance->logout();
-    $subdomains = array_keys($config_array, '52.233.128.182:'.$port);
+    $subdomains = array_keys($config_array, '23.100.0.11:'.$port);
     if(count($subdomains)>0){
         foreach($subdomains as $subdomain){
             unset($config_array[$subdomain]);
