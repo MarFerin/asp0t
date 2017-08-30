@@ -98,13 +98,14 @@
 						success: function(data) {
 							$('#viewclientdiv').append('<div id="serverGroups" class="field half first"></div>');
 							for(i = 0;i<data["All Groups"].length;i++){
-								$('#serverGroups').append('<input type="checkbox" id="sg'+data["All Groups"][i].replace(/\s/g, '')+'" name="sg'+
-								data["All Groups"][i].replace(/\s/g, '')+'">'+
-								'<label style="width:100%" for="sg'+data["All Groups"][i].replace(/\s/g, '')+'">'+(data["Icons"][i]==null?'':('<img src="'+data["Icons"][i]+
-								'" style="vertical-align: middle; width: 16px; height: 16px"> '))+data["All Groups"][i]+'</label>');
+								$('#serverGroups').append('<input type="checkbox" id="sg'+data["All Groups"][i]+'" name="sg'+
+								data["All Groups"][i]+'">'+
+								'<label style="width:100%" for="sg'+data["All Groups"][i]+'">'+(data["Icons"][i]==null?'':('<img src="'+data["Icons"][i]+
+								'" style="vertical-align: middle; width: 16px; height: 16px"> '))+data["Group Names"][i]+'</label>');
 							}
+							$('#serverGroups').append('<button id="applyGroups" style="margin-top: 0.4rem;" onclick="applyGroups('+sid+','+clid+')">Apply</button>');
 							for(i = 1;i<data["Client Groups"].length;i++){
-								$('#sg'+data["Client Groups"][i].replace(/\s/g, '')).prop('checked', true);
+								$('#sg'+data["Client Groups"][i]).prop('checked', true);
 							}
 							$('#viewclientdiv').append('<div id="info" class="field half"></div>');
 							$('#info').append('<label style="margin-bottom: 0px;">Version:</label>');
@@ -113,6 +114,17 @@
 							$('#info').append('<p style="margin: 0 0 1.2rem 0">'+data["Online Since"]+'</p>');
 							$('#info').append('<label style="margin-bottom: 0px;">Idle Time:</label>');
 							$('#info').append('<p style="margin: 0 0 1.2rem 0">'+data["Idle Time"]+'</p>');
+						}
+					});
+				}
+				function applyGroups(sid,clid){
+					var sendJson = {"sid":sid, "clid":clid, "Passkey":sensitivePass};
+					$.ajax({
+						type: "POST",
+						url: "/ajax.php",
+						dataType: "json",
+						data: {applyGroups:sendJson},
+						success: function(data) {
 						}
 					});
 				}

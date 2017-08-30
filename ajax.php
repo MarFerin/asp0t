@@ -83,6 +83,7 @@ if (isset($_POST['getTeamspeakData'])) {
         $subdomain = array_keys($config_array, '23.100.0.11:'.$receiveData["Port"]);
         echo json_encode(array("Name"=>(string)$ts3_VirtualServer->virtualserver_name,"Subdomain"=>$subdomain,
             "Slots"=>(string)$ts3_VirtualServer->virtualserver_maxclients,"clientPerms"=>$clientPerms,"channelClientPerms"=>$channelClientPerms));
+        $ts3_VirtualServer->logout();
     }
 }
 
@@ -116,18 +117,20 @@ if (isset($_POST['getClientInfo'])) {
         $ts3_Client = $ts3_VirtualServer->clientGetById($receiveData["clid"]);
         $clientGroups = $ts3_Client->memberOf();
         foreach($clientGroups as $clientGroup){
-            $clientServerGroups[] = $clientGroup->__toString();
+            $clientServerGroups[] = $clientGroup->getId();
         }
         $response["Client Groups"] = $clientServerGroups;
         $allServerGroups = $ts3_VirtualServer->serverGroupList();
         foreach($allServerGroups as $serverGroup){
             if($serverGroup->type == TeamSpeak3::GROUP_DBTYPE_REGULAR){
-                $serverGroups[] = $serverGroup->__toString();
+                $serverGroups[] = $serverGroup->getId();
+                $serverGroupNames[] = $serverGroup->__toString();
                 $helperString = $serverGroup->iconDownload();
                 $icons[]=($helperString!=null?("data:".TeamSpeak3_Helper_Convert::imageMimeType($helperString).";base64,".$helperString->toBase64()):null);
             }
         }
         $response["All Groups"] = $serverGroups;
+        $response["Group Names"] = $serverGroupNames;
         $response["Icons"] = $icons;
         $response["Version"] = TeamSpeak3_Helper_Convert::versionShort($ts3_Client->client_version) . " on " . $ts3_Client->client_platform;
 
@@ -136,6 +139,7 @@ if (isset($_POST['getClientInfo'])) {
         $response["Description"]=$ts3_Client->client_description;
         //$response["vardump"]=
         //$response["printr"]=(string)print_r($ts3_Client);
+        $ts3_VirtualServer->logout();
         echo json_encode($response);
     }
 }
@@ -269,7 +273,7 @@ function checkActivity(){
             }   
         }
     }
-    $ts3_ServerInstance->logout();
+    $ts3_VirtualServer->logout();
     return $inactiveServers;
 }
 function deleteInactive(){
@@ -333,6 +337,7 @@ function resetTeamspeak($port) {
     createClanChannels($ts3_VirtualServer);
     createClanPermissions($ts3_VirtualServer);
     $serverToken = $new_sid["token"];
+    $ts3_ServerInstance->logout();
     return $serverToken;
 }
 function createTeamspeak($teamspeakData) {
