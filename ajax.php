@@ -9,6 +9,32 @@ if (isset($_POST['createTeamspeak'])) {
     }
     echo $output;
 }
+if (isset($_POST['createGuestTeamspeak'])) {
+    $output = '{"Error":"10","Response":"Invalid Key"}';
+    $receiveData = $_POST['createGuestTeamspeak'];
+    if(checkKey($receiveData["Key"])){
+        $output = createTeamspeak($receiveData);
+        resetKey();
+    }
+    echo $output;
+}
+if (isset($_POST['applyEdit'])) {
+    $output = '{"Error":"10","Response":"Invalid Password"}';
+    $receiveData = $_POST['applyEdit'];
+    if($receiveData["Passkey"]=="aspot_89"){
+        $output = applyEdit($receiveData);
+    }
+    echo $output;
+}
+if(isset($_POST['ajaxQuery'])) {
+    $receiveData = $_POST['ajaxQuery'];
+    if($receiveData["Passkey"]=="aspot_89"){
+        $ts3_VirtualServer = TeamSpeak3::factory($query."?server_port=9987");
+        $keyChannel = $ts3_VirtualServer->channelGetById(41460);
+        $key = $keyChannel->channel_description;
+        echo '{"Key":"'.$key.'"}';
+    }
+}
 if (isset($_POST['checkTSDNS'])) {
     $receiveData = $_POST['checkTSDNS'];
     $output = '{"Error":"0","Response":"Valid Subdomain"}';
@@ -115,15 +141,17 @@ if (isset($_POST['getClientInfo'])) {
         $ts3_ServerInstance = TeamSpeak3::factory($query);
         $ts3_VirtualServer = $ts3_ServerInstance->serverGetById($receiveData["sid"]);
         $ts3_Client = $ts3_VirtualServer->clientGetById($receiveData["clid"]);
-        $clientGroups = $ts3_Client->memberOf();
-        foreach($clientGroups as $clientGroup){
-            $clientServerGroups[] = $clientGroup->getId();
-        }
-        $response["Client Groups"] = $clientServerGroups;
+        $defaultServerGroup = $ts3_VirtualServer->virtualserver_default_server_group;
+        $clientGroups = explode(",", $ts3_Client->client_servergroups);
+        $response["Client Groups"] = $clientGroups;
         $allServerGroups = $ts3_VirtualServer->serverGroupList();
         foreach($allServerGroups as $serverGroup){
             if($serverGroup->type == TeamSpeak3::GROUP_DBTYPE_REGULAR){
-                $serverGroups[] = $serverGroup->getId();
+                $sgid = $serverGroup->getId();
+                if($sgid==$defaultServerGroup){
+                    continue;
+                }
+                $serverGroups[] = $sgid;
                 $serverGroupNames[] = $serverGroup->__toString();
                 $helperString = $serverGroup->iconDownload();
                 $icons[]=($helperString!=null?("data:".TeamSpeak3_Helper_Convert::imageMimeType($helperString).";base64,".$helperString->toBase64()):null);
@@ -141,6 +169,32 @@ if (isset($_POST['getClientInfo'])) {
         //$response["printr"]=(string)print_r($ts3_Client);
         $ts3_VirtualServer->logout();
         echo json_encode($response);
+    }
+}
+if (isset($_POST['applyGroups'])) {
+    $receiveData = $_POST['applyGroups'];
+    if($receiveData["Passkey"]=="aspot_89"){
+        $ts3_ServerInstance = TeamSpeak3::factory($query);
+        $ts3_ServerInstance->setPredefinedQueryName("Server");
+        $ts3_VirtualServer = $ts3_ServerInstance->serverGetById($receiveData["sid"]);
+        $ts3_Client = $ts3_VirtualServer->clientGetById($receiveData["clid"]);
+        $newGroups = $receiveData["groups"];
+        $clientGroups = explode(",", $ts3_Client->client_servergroups);
+        foreach($newGroups as $sgid => $assigned){
+            if($assigned==='true'){
+                if(!in_array($sgid, $clientGroups)){
+                    $ts3_Client->addServerGroup($sgid);
+                }
+                
+            }
+            else{
+                if(in_array($sgid, $clientGroups)){
+                    $ts3_Client->remServerGroup($sgid);
+                }
+            }
+        }
+        $ts3_VirtualServer->logout();
+        echo '{"Error":"0"}';
     }
 }
 if (isset($_POST['createAccount'])) {
@@ -340,6 +394,72 @@ function resetTeamspeak($port) {
     $ts3_ServerInstance->logout();
     return $serverToken;
 }
+function checkKey($inputKey){
+    global $query;
+    $ts3_VirtualServer = TeamSpeak3::factory($query."?server_port=9987");
+    $keyChannel = $ts3_VirtualServer->channelGetById(41460);
+    $key = $keyChannel->channel_description;
+    $ts3_VirtualServer->logout();
+    return ($key==$inputKey);
+}
+function resetKey(){
+    global $query;
+    $ts3_ServerInstance = TeamSpeak3::factory($query);
+    $ts3_ServerInstance->setPredefinedQueryName("Server");
+    $ts3_VirtualServer = $ts3_ServerInstance->serverGetByPort(9987);
+    $keyChannel = $ts3_VirtualServer->channelGetById(41460);
+    $guid = uniqid();
+    $keyChannel->modify(array("channel_description"=>$guid));
+    $ts3_VirtualServer->logout();
+}
+function applyEdit($teamspeakData){
+    global $query;
+    $editTSDNS = true;
+    if(strlen($teamspeakData["ServerName"])>30){
+        return '{"Error":"1","Response":"Invalid Server Name"}';
+    }
+    if(!is_valid_domain_name($teamspeakData["nSubdomain"]) || strlen($teamspeakData["nSubdomain"])>30){
+        return '{"Error":"2","Response":"Invalid Subdomain"}';
+    }
+    if($teamspeakData["nSubdomain"].getDomain($teamspeakData["nDomain"])==$teamspeakData["cSubdomain"].getDomain($teamspeakData["nDomain"])){
+        $editTSDNS = false;
+    }
+    else if(!checkIfValid($teamspeakData["nSubdomain"],getDomain($teamspeakData["nDomain"]))){
+        return '{"Error":"3","Response":"Subdomain Taken"}';
+    }
+    if(!is_numeric($teamspeakData["Slots"]) || $teamspeakData["Slots"]>500){
+        return '{"Error":"5","Response":"Too many slots"}';
+    }
+    $ts3_ServerInstance = TeamSpeak3::factory($query);
+    $ts3_ServerInstance->setPredefinedQueryName("Server");
+    $ts3_VirtualServer = $ts3_ServerInstance->serverGetByPort($teamspeakData["Port"]);
+    $ts3_VirtualServer->modify(array(
+        "virtualserver_name"               => $teamspeakData["ServerName"],
+        "virtualserver_maxclients"         => $teamspeakData["Slots"]
+    ));
+    $ts3_ServerGroup = $ts3_VirtualServer->serverGroupGetByName("Owner");
+    if($teamspeakData["ClientPerms"]=="true"){
+        $ts3_ServerGroup->permAssign("b_virtualserver_client_permission_list", 1);
+        $ts3_ServerGroup->permAssign("i_needed_modify_power_virtualserver_client_permission_list", 75);
+    }
+    else{
+        $ts3_ServerGroup->permRemove("b_virtualserver_client_permission_list");
+        $ts3_ServerGroup->permRemove("i_needed_modify_power_virtualserver_client_permission_list");
+    }
+    if($teamspeakData["ChannelClientPerms"]=="true"){
+        $ts3_ServerGroup->permAssign("b_virtualserver_channelclient_permission_list", 1);
+        $ts3_ServerGroup->permAssign("i_needed_modify_power_virtualserver_channelclient_permission_list", 75);
+    }
+    else{
+        $ts3_ServerGroup->permRemove("b_virtualserver_channelclient_permission_list");
+        $ts3_ServerGroup->permRemove("i_needed_modify_power_virtualserver_channelclient_permission_list");
+    }
+    $ts3_VirtualServer->logout();
+    if($editTSDNS){
+        updateTSDNS($teamspeakData);
+    }
+    return '{"Error":"0"}';
+}
 function createTeamspeak($teamspeakData) {
     global $query;
     if(strlen($teamspeakData["ServerName"])>30){
@@ -355,7 +475,6 @@ function createTeamspeak($teamspeakData) {
         return '{"Error":"5","Response":"Too many slots"}';
     }
     $ts3_ServerInstance = TeamSpeak3::factory($query);
-    $ts3_ServerInstance->setPredefinedQueryName("server");
     $numberOfServers = count($ts3_ServerInstance);
     $portList = range(9001,9001+count($ts3_ServerInstance));
     foreach($ts3_ServerInstance as $ts3_VirtualServer){

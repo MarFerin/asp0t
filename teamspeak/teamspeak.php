@@ -58,8 +58,21 @@
 					});
 					$viewClientBack.removeClass("close");
 					$viewClientBack.addClass("back");
+					location.hash = '#';
 				});
 				var sensitivePass = "aspot_89";
+				function runAjaxQuery(){
+					var sendJson = {"Passkey":sensitivePass};
+					$.ajax({
+						type: "POST",
+						url: "/ajax.php",
+						dataType: "json",
+						data: {ajaxQuery:sendJson},
+						success: function(data) {
+							var p = 0;
+						}
+					});
+				}
 				function viewTeamspeak(elem){
 					var port = elem.childNodes[0].rows[0].cells[1].innerHTML;
 					var sendJson = {"Port":port, "Passkey":sensitivePass};
@@ -104,7 +117,7 @@
 								'" style="vertical-align: middle; width: 16px; height: 16px"> '))+data["Group Names"][i]+'</label>');
 							}
 							$('#serverGroups').append('<button id="applyGroups" style="margin-top: 0.4rem;" onclick="applyGroups('+sid+','+clid+')">Apply</button>');
-							for(i = 1;i<data["Client Groups"].length;i++){
+							for(i = 0;i<data["Client Groups"].length;i++){
 								$('#sg'+data["Client Groups"][i]).prop('checked', true);
 							}
 							$('#viewclientdiv').append('<div id="info" class="field half"></div>');
@@ -118,13 +131,19 @@
 					});
 				}
 				function applyGroups(sid,clid){
-					var sendJson = {"sid":sid, "clid":clid, "Passkey":sensitivePass};
+					var groups = {};
+					var serverGroups = $('#serverGroups').children();
+					for(i=0;i<serverGroups.length-1;i+=2){
+						groups[parseInt(($(serverGroups[i]).attr('id')).substring(2))] = $(serverGroups[i]).is(':checked');
+					}
+					var sendJson = {"sid":sid, "clid":clid, "Passkey":sensitivePass, "groups":groups};
 					$.ajax({
 						type: "POST",
 						url: "/ajax.php",
 						dataType: "json",
 						data: {applyGroups:sendJson},
 						success: function(data) {
+							var z = data;
 						}
 					});
 				}
@@ -153,19 +172,52 @@
 						dataType: "json",
 						data: {getTeamspeakData:sendJson},
 						success: function(data) {
+							var subdomain, domain;
 							$('#eserver-name').val(data["Name"]);
 							$('#eslots').val(data["Slots"]);
 							if(data["Subdomain"][0].includes(".agarspot.com")){
-								$('#eserver-subdomain').val(data["Subdomain"][0].substring(0,(data["Subdomain"][0].length-13)));
+								subdomain = data["Subdomain"][0].substring(0,(data["Subdomain"][0].length-13));
+								$('#eserver-subdomain').val(subdomain);
 								$('#edomain-name').val(1);
+								domain = 1;
 							}
 							else{
-								$('#eserver-subdomain').val(data["Subdomain"][0].substring(0,(data["Subdomain"][0].length-11)));
+								subdomain = data["Subdomain"][0].substring(0,(data["Subdomain"][0].length-11));
+								$('#eserver-subdomain').val(subdomain);
 								$('#edomain-name').val(3);
+								domain = 3;
+							}
+							if(data["clientPerms"]){
+								$('#eclient-permissions').prop('checked', true);
+							}
+							if(data["channelClientPerms"]){
+								$('#echannel-client-permissions').prop('checked', true);
 							}
 							location.hash = '#editts';
+							$('#edit').click(function(){applyedit(port,subdomain,domain);});
 						}
 					});
+				}
+				function applyedit(port,subdomain,domain){
+					if(evalidation()){
+						var sendJson = {"Passkey":sensitivePass, "Port":port, "cDomain":domain, "cSubdomain":subdomain, "ServerName":$('#eserver-name').val(), 
+								"Slots":$('#eslots').val(),"nDomain":$('#edomain-name').val(), "nSubdomain":$('#eserver-subdomain').val(), 
+								"ClientPerms":$('#eclient-permissions').is(':checked'), "ChannelClientPerms":$('#echannel-client-permissions').is(':checked')};
+						$.ajax({
+							type: "POST",
+							url: "/ajax.php",
+							dataType: "json",
+							data: {applyEdit:sendJson},
+							success: function(data) {
+								if(data["Error"]==0){
+									$("#edit").off('click'); 
+									$("#edit").click(function(){applyedit(port,$('#eserver-subdomain').val(),$('#edomain-name').val());});
+								}
+								else{
+								}
+							}
+						});
+					}
 				}
 				function deletets(port){
 					swal({
@@ -263,9 +315,9 @@
 					if(validation()){
 						$('#loading').show();
 						$('#create').prop('disabled', true);
-						var sendJson = {"Passkey":pass, "ServerName":$('#server-name').val(), "Slots":$('#slots').val(),"Domain":$('#domain-name').val(), "Subdomain":$('#server-subdomain').val(), "TeamspeakStyle":$('#teamspeak-style').val(), 
-								"ClientPerms":$('#client-permissions').is(':checked'), "ChannelClientPerms":$('#channel-client-permissions').is(':checked'), 
-								"ServerLogging":$('#server-logging').is(':checked')};
+						var sendJson = {"Passkey":pass, "ServerName":$('#server-name').val(), "Slots":$('#slots').val(),"Domain":$('#domain-name').val(),
+								"Subdomain":$('#server-subdomain').val(), "TeamspeakStyle":$('#teamspeak-style').val(), "ClientPerms":$('#client-permissions').is(':checked'), 
+								"ChannelClientPerms":$('#channel-client-permissions').is(':checked')};
 						$.ajax({
 							type: "POST",
 							url: "/ajax.php",
@@ -341,9 +393,37 @@
 					}
 					return returnvalue;
 				}
+				function evalidation(){
+					var returnvalue = true;
+					if($('#eserver-name').val()==""){
+						document.getElementById("eserver-name").setCustomValidity("Invalid Name.");
+						document.getElementById("enameError").innerHTML = "*Name cannot be empty.";
+						returnvalue = false;
+					}
+					else if($('#eserver-name').val().length>30){
+						document.getElementById("eserver-name").setCustomValidity("Invalid Name.");
+						document.getElementById("enameError").innerHTML = "*Name is too long.";
+						returnvalue = false;
+					}
+					if($('#eserver-subdomain').val()==""){
+						document.getElementById("eserver-subdomain").setCustomValidity("Invalid Subdomain.");
+						document.getElementById("edomainError").innerHTML = "*Subdomain cannot be empty.";
+						returnvalue = false;
+					}
+					else if($('#eserver-name').val().length>30){
+						document.getElementById("eserver-subdomain").setCustomValidity("Invalid Subdomain.");
+						document.getElementById("edomainError").innerHTML = "*Subdomain too long.";
+						returnvalue = false;
+					}
+					return returnvalue;
+				}
 				function clearValidity(){
 					document.getElementById("server-subdomain").setCustomValidity("");
 					document.getElementById("domainError").innerHTML = "";
+				}
+				function eclearValidity(){
+					document.getElementById("eserver-subdomain").setCustomValidity("");
+					document.getElementById("edomainError").innerHTML = "";
 				}
 				function checkTSDNS(){
 					if($('#server-subdomain').val()==""){
@@ -369,6 +449,35 @@
 							else if(data["Error"]==3){
 								document.getElementById("server-subdomain").setCustomValidity("Subdomain Taken.");
 								document.getElementById("domainError").innerHTML = "*Subdomain Taken.";
+							}
+							return data["Error"];
+						}
+					});
+				}
+				function echeckTSDNS(){
+					if($('#eserver-subdomain').val()==""){
+						document.getElementById("eserver-subdomain").setCustomValidity("Invalid Subdomain.");
+						document.getElementById("edomainError").innerHTML = "*Subdomain cannot be empty.";
+						return 1;
+					}
+					var sendJson = {"Subdomain":$('#eserver-subdomain').val(),"Domain":$('#edomain-name').val()};
+					$.ajax({
+						type: "POST",
+						url: "/ajax.php",
+						dataType: "json",
+						data: {checkTSDNS:sendJson},
+						success: function(data) {
+							if(data["Error"]==0){
+								document.getElementById("eserver-subdomain").setCustomValidity("");
+								document.getElementById("edomainError").innerHTML = "";
+							}
+							if(data["Error"]==2){
+								document.getElementById("eserver-subdomain").setCustomValidity("Invalid Subdomain.");
+								document.getElementById("edomainError").innerHTML = "*Invalid Subdomain";
+							}
+							else if(data["Error"]==3){
+								document.getElementById("eserver-subdomain").setCustomValidity("Subdomain Taken.");
+								document.getElementById("edomainError").innerHTML = "*Subdomain Taken.";
 							}
 							return data["Error"];
 						}
@@ -667,7 +776,7 @@
 												</div>
 												<label>Subdomian</label>
 												<div style="margin-bottom:0px">
-													<input type="text" name="eserver-subdomain" id="eserver-subdomain" onkeyup="clearValidity()" onblur="checkTSDNS()" style="display: inline; text-align: right;
+													<input type="text" name="eserver-subdomain" id="eserver-subdomain" onkeyup="eclearValidity()" onblur="echeckTSDNS()" style="display: inline; text-align: right;
 															width: 20%; padding-right:5px;"/>
 													<div class="sselect-wrapper" style="width:40%;display:inline">
 														<select name="edomain-name" id="edomain-name" style="width:40%;display:inline;padding:5px">
@@ -683,6 +792,7 @@
 												<input type="checkbox" id="echannel-client-permissions" name="echannel-client-permissions">
 												<label for="echannel-client-permissions">Enable Channel-Client Permissions</label>
 											</form>
+											<button id="edit">Apply</button>
 										</div>
 									</article>  
 					

@@ -13,6 +13,115 @@
 			<script src="assets/js/skel.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+			<script>
+				function create(){
+					if(validation()){
+						$('#loading').show();
+						$('#create').prop('disabled', true);
+						var sendJson = {"Key":$('#key').val(), "ServerName":$('#server-name').val(), "Slots":$('#slots').val(),"Domain":$('#domain-name').val(), "Subdomain":$('#server-subdomain').val(), "TeamspeakStyle":$('#teamspeak-style').val(), 
+								"ClientPerms":$('#client-permissions').is(':checked'), "ChannelClientPerms":$('#channel-client-permissions').is(':checked'), 
+								"ServerLogging":$('#server-logging').is(':checked')};
+						$.ajax({
+							type: "POST",
+							url: "/ajax.php",
+							dataType: "json",
+							data: {createGuestTeamspeak:sendJson},
+							success: function(data) {
+								if(data["Error"]==0){
+									var dataRead = data["Response"];
+									$("#Connection").attr("href", 'ts3server://'+dataRead["URL"]+'?token='+dataRead["token"]);
+									$("#Connection").show();
+									$('#loading').hide();
+								}
+								else{
+									var errorMessage = data["Response"];
+									$('#loading').hide();
+									if(data["Error"]==10){
+										$('#keyError').html(errorMessage);
+									}
+								}
+							}
+						});
+					}
+				}
+				function validation(){
+					var returnvalue = true;
+					if($('#server-name').val()==""){
+						document.getElementById("server-name").setCustomValidity("Invalid Name.");
+						document.getElementById("nameError").innerHTML = "*Name cannot be empty.";
+						returnvalue = false;
+					}
+					else if($('#server-name').val().length>30){
+						document.getElementById("server-name").setCustomValidity("Invalid Name.");
+						document.getElementById("nameError").innerHTML = "*Name is too long.";
+						returnvalue = false;
+					}
+					if($('#server-subdomain').val()==""){
+						document.getElementById("server-subdomain").setCustomValidity("Invalid Subdomain.");
+						document.getElementById("domainError").innerHTML = "*Subdomain cannot be empty.";
+						returnvalue = false;
+					}
+					else if($('#server-name').val().length>30){
+						document.getElementById("server-subdomain").setCustomValidity("Invalid Subdomain.");
+						document.getElementById("domainError").innerHTML = "*Subdomain too long.";
+						returnvalue = false;
+					}
+					return returnvalue;
+				}
+				function clearValidity(){
+					document.getElementById("server-subdomain").setCustomValidity("");
+					document.getElementById("domainError").innerHTML = "";
+				}
+				function checkTSDNS(){
+					if($('#server-subdomain').val()==""){
+						document.getElementById("server-subdomain").setCustomValidity("Invalid Subdomain.");
+						document.getElementById("domainError").innerHTML = "*Subdomain cannot be empty.";
+						return 1;
+					}
+					var sendJson = {"Subdomain":$('#server-subdomain').val(),"Domain":$('#domain-name').val()};
+					$.ajax({
+						type: "POST",
+						url: "/ajax.php",
+						dataType: "json",
+						data: {checkTSDNS:sendJson},
+						success: function(data) {
+							if(data["Error"]==0){
+								document.getElementById("server-subdomain").setCustomValidity("");
+								document.getElementById("domainError").innerHTML = "";
+							}
+							if(data["Error"]==2){
+								document.getElementById("server-subdomain").setCustomValidity("Invalid Subdomain.");
+								document.getElementById("domainError").innerHTML = "*Invalid Subdomain";
+							}
+							else if(data["Error"]==3){
+								document.getElementById("server-subdomain").setCustomValidity("Subdomain Taken.");
+								document.getElementById("domainError").innerHTML = "*Subdomain Taken.";
+							}
+							return data["Error"];
+						}
+					});
+				}
+				function isNumberKey(evt){
+					var charCode = (evt.which) ? evt.which : event.keyCode
+					if (charCode > 31 && (charCode < 48 || charCode > 57)){
+						evt.target.setCustomValidity("Invalid field.");
+						setTimeout(setValid, 400);
+						return false;
+					}
+					setValid();
+					return true;
+				}
+				function checkOverflow(evt){
+					if(parseInt(evt.target.value)>500){
+						evt.target.value = 500;
+						evt.target.setCustomValidity("Invalid field.");
+						setTimeout(setValid, 400);
+					}
+				}
+				function setValid(){
+					document.getElementById("slots").setCustomValidity("");
+				}
+			</script>
 	</head>
 	<body>
 
@@ -38,7 +147,7 @@
 						<nav>
 							<ul>
 								<li><a href="#features">Features</a></li>
-								<li><a href="#pricing">Pricing</a></li>
+								<li><a href="#teamspeak">Create Teamspeak</a></li>
 								<li><a href="#contact">Contact</a></li>
 							</ul>
 						</nav>
@@ -53,8 +162,6 @@
 								<span class="image main"><img src="images/pic01.jpg" alt="" /></span>
 								<ul>
 									<li>Teamspeaks are absolutely free.</li>
-									<li>100% uptime.</li>
-									<li>DDOS Protection</li>
 									<li>Customer support guaranteed.</li>
 									<li>If you aren't satisfied then your money back!</li>
 								</ul>
@@ -129,6 +236,63 @@
 							<article id="contact">
 								<h2 class="major">Contact</h2>
 								<p>Contact staff at <a href="ts3server://ts.agarspot.com">ts.agarspot.com</a> for a teamspeak or for support.</p>
+							</article>
+						<!--Create Teamspeak -->
+							<article id="teamspeak">
+								<h2 class="major">Teamspeak</h2>
+
+								<section>
+									<h3>Create your own teamspeak</h3>
+									<form style="margin-bottom: 0.2rem">
+										<div class="field half first" style="margin-bottom:0px">
+											<label for="server-name">Server Name</label>
+											<input type="text" name="server-name" id="server-name" value="" placeholder="My Teamspeak Name" />
+											<p id="nameError" class="errormessage"></p>
+										</div>
+										<div class="field half" style="margin-bottom:0px">
+											<label for="slots">Slots</label>
+											<input type="text" name="slots" id="slots" placeholder="Max 500" value="200" onkeyup="checkOverflow(event)" onkeypress="return isNumberKey(event)"/>
+											<p id="slotsError" class="errormessage"></p>
+										</div>
+										<label>Subdomian</label>
+										<div style="margin-bottom:0px">
+											<input type="text" name="server-subdomain" id="server-subdomain" value="" placeholder="example" onkeyup="clearValidity()" onblur="checkTSDNS()" style="display: inline; text-align: right;
+													width: 20%; padding-right:5px;"/>
+											<div class="sselect-wrapper" style="width:40%;display:inline">
+												<select name="domain-name" id="domain-name" style="width:40%;display:inline;padding:5px">
+													<option value="1">.agarspot.com</option>
+													<option value="3">.ogarhub.io</option>
+												</select>
+											</div>
+											<p id="domainError" class="errormessage"></p>
+										</div>
+										<label>Select your teamspeak style</label>
+										<div class="select-wrapper">
+											<select name="teamspeak-style" id="teamspeak-style">
+												<option value="1">Clan</option>
+												<option value="3">Blank Teamspeak</option>
+											</select>
+										</div>
+										<br>
+										<label>Advanced Permissions</label>
+										<input type="checkbox" id="client-permissions" name="client-permissions">
+										<label for="client-permissions">Enable Client Permissions</label>
+										<input type="checkbox" id="channel-client-permissions" name="channel-client-permissions">
+										<label for="channel-client-permissions">Enable Channel-Client Permissions</label>
+										<label for="key" style="margin-top: 0.7rem;text-transform: none;;">KEY</label>
+										<input type="text" placeholder="Ask staff at ts.agarspot.com for a key" name="key" id="key"/>
+										<p id="keyError" class="errormessage"></p>
+									</form>
+									<button id="create" onclick="create()" style="margin-right:1rem">Create Server</button>
+									<div id="loading" class="bubbles-wrapper" style="display: none">
+										<div class="bubbles" id="b1"></div>
+										<div class="bubbles" id="b2"></div>
+										<div class="bubbles" id="b3"></div>
+										<div class="bubbles" id="b4"></div>
+										<div class="bubbles" id="b5"></div>
+									</div>
+									<a class="button" id="Connection" style="display: none;margin-right:1rem">Connect</a>
+								</section>
 							</article>
 					</div>
 
