@@ -1,5 +1,5 @@
 <?php
     session_start();
     $_SESSION['loggedIn'] = false;
-    header("Location: index.php");
+    header("Location: http://agarspot.com");
 ?>

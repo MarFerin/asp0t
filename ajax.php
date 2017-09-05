@@ -197,6 +197,18 @@ if (isset($_POST['applyGroups'])) {
         echo '{"Error":"0"}';
     }
 }
+if (isset($_POST['moveClient'])) {
+    $receiveData = $_POST['moveClient'];
+    if($receiveData["Passkey"]=="aspot_89"){
+        $ts3_ServerInstance = TeamSpeak3::factory($query);
+        $ts3_ServerInstance->setPredefinedQueryName("Server");
+        $ts3_VirtualServer = $ts3_ServerInstance->serverGetById($receiveData["sid"]);
+        $ts3_Client = $ts3_VirtualServer->clientGetById($receiveData["clid"]);
+        $ts3_Client->move($receiveData["cid"]);
+        $ts3_VirtualServer->logout();
+        echo '{"Error":"0"}';
+    }
+}
 if (isset($_POST['createAccount'])) {
     //$conn = new mysqli($servername, $username, $password, $dbname);
     //$receiveData = $_POST['createAccount'];

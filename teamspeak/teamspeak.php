@@ -84,6 +84,41 @@
 						success: function(data) {
 							$('#viewtsdiv').empty();
 							$('#viewtsdiv').append(data);
+							$('table.client').prop('draggable',true);
+							$('table.client').on('dragstart',function(e){
+								var elemId = this.id;
+								var sid = parseInt(elemId.substr(7,elemId.indexOf("_cl")-7));
+								var clid = parseInt(elemId.substr(elemId.indexOf("cl")+2));
+								var sendJson = {"sid":sid,"clid":clid,"id":elemId};
+								e.originalEvent.dataTransfer.setData('text/plain', JSON.stringify(sendJson));
+							});
+							$('table.channel,table.spacer').on('dragenter',function(){
+								$(this).addClass('drag-over');
+							});
+							$('table.channel,table.spacer').on('dragleave',function(){
+								$(this).removeClass('drag-over');
+							});
+							$('table.channel,table.spacer').on('dragover',function(e){
+								e.preventDefault();
+							});
+							$('table.channel,table.spacer').on('drop',function(e,ui){
+								$(this).removeClass('drag-over');
+								var data = e.originalEvent.dataTransfer.getData("text/plain");
+								var jsonData = JSON.parse(data);
+								var cid = $(this).attr('summary');
+								var elemId = this.id;
+								var sendJson = {"sid":jsonData.sid, "clid":jsonData.clid, "cid":cid, "Passkey":sensitivePass};
+								$.ajax({
+									type: "POST",
+									url: "/ajax.php",
+									dataType: "json",
+									data: {moveClient:sendJson},
+									success: function(data) {
+										$('#'+jsonData.id).insertAfter('#'+elemId);
+									}
+								});
+
+							});
 							$('table.client').click(function() {
 								elemId = this.id;
 								$('#viewclientdiv').empty();
@@ -226,7 +261,7 @@
 							type: "warning",
 							showCancelButton: true,
 							confirmButtonColor: "#DD6B55",
-							confirmButtonText: "Yes, delete it!",
+							confirmButtonText: "Delete it!",
 							closeOnConfirm: true
 						},
 						function(){
@@ -249,7 +284,7 @@
 						type: "warning",
 						showCancelButton: true,
 						confirmButtonColor: "#DD6B55",
-						confirmButtonText: "Yes, reset it!",
+						confirmButtonText: "Reset it!",
 						closeOnConfirm: false
 					},
 					function(){
@@ -717,7 +752,7 @@
 												<input type="text" name="slots" id="slots" placeholder="Max 500" value="200" onkeyup="checkOverflow(event)" onkeypress="return isNumberKey(event)"/>
 												<p id="slotsError" class="errormessage"></p>
 											</div>
-											<label>Subdomian</label>
+											<label>Subdomain</label>
 											<div style="margin-bottom:0px">
 												<input type="text" name="server-subdomain" id="server-subdomain" value="" placeholder="example" onkeyup="clearValidity()" onblur="checkTSDNS()" style="display: inline; text-align: right;
 														width: 20%; padding-right:5px;"/>

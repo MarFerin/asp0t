@@ -217,10 +217,10 @@ class TeamSpeak3_Viewer_Html implements TeamSpeak3_Viewer_Interface
 
       foreach($this->currSib as $sibling)
       {
-        $prefix .=  ($sibling) ? $this->getImage("tree_line.gif") : $this->getImage("tree_blank.png");
+        $prefix .=  ($sibling) ? $this->getImage("tree_blank.png") : $this->getImage("tree_blank.png");
       }
 
-      $prefix .= ($last) ? $this->getImage("tree_end.gif") : $this->getImage("tree_mid.gif");
+      $prefix .= ($last) ? $this->getImage("tree_blank.png") : $this->getImage("tree_blank.png");
     }
 
     return $prefix;

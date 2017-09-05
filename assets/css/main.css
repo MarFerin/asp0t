@@ -1013,16 +1013,21 @@
 		width: 10rem;
 		max-width: 10rem;
 	}
-	td.corpus.client {
+	td.corpus {
 		width: 100%;
 	}
-	td.suffix.client > img{
+	td.suffix > img{
 		width: 16px;
 		height: 16px;
 	}
 	td.corpus.spacer.center {
 		width: 100%;
 		text-align: center;
+	}
+	.drag-over {
+		background-color: #484848;
+		border: solid 1px #FFFFFF;
+
 	}
 	table.alt {
 		margin: 0 0 2rem 0;
