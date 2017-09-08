@@ -145,7 +145,7 @@ function deleteInactive(){
         data: {deleteInactive:sendJson},
         success: function(data) {
             swal({
-                title: data["Count"]+"teamspeaks deleted.",
+                title: data["Count"]+" teamspeaks deleted.",
                 type: "success",
                 allowOutsideClick: true,
                 showConfirmButton: true
@@ -286,7 +286,7 @@ function getServerList(){
                     '<tr><td class="serverName">'+
                     data[i].Name+'</td><td style="width: 3rem">'+data[i].Port+'</td><td style="width: 3rem">'+
                     data[i].Online+'/'+data[i].Slots+'</td><td class="serverSubdomain">'+
-                    data[i].Subdomain[0]+'</td></tr></table></td><td><a href="ts3server://23.100.0.11:'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
+                    data[i].Subdomain[0]+'</td></tr></table></td><td><a href="ts3server://104.45.30.123:'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
                     '<a onclick="editts('+data[i].Port+')" class="tool icon fa-pencil"></a>'+
                     '<a onclick="deletets('+data[i].Port+')" class="tool icon fa-trash"></a>'+
                     '<a onclick="resetts('+data[i].Port+')" class="tool icon fa-refresh"></a>'+'</td></tr></table>');

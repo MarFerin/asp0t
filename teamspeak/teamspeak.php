@@ -100,7 +100,8 @@
 									<h2 class="major">Update TSDNS</h2>
 									<label>Current Subdomain</label>
 									<div style="margin-bottom:0px">
-										<input type="text" name="current-dns" id="current-dns" value="" placeholder="" onkeyup="clearValidity()" onblur="checkcurrentTSDNS()" style="display: inline; text-align: right;
+										<input type="text" name="current-dns" id="current-dns" value="" placeholder="" onkeyup="clearValidity()" 
+												onblur="checkcurrentTSDNS()" style="display: inline; text-align: right;
 												width: 20%; padding-right:5px;"/>
 										<div class="sselect-wrapper" style="width:40%;display:inline">
 											<select name="cdomain-name" id="cdomain-name" style="width:40%;display:inline;padding:5px">
