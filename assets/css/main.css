@@ -1003,8 +1003,7 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		width: 13rem;
-		max-width: 13rem;
+		width: 70%;
 	}
 	td.serverSubdomain {
 		overflow: hidden;

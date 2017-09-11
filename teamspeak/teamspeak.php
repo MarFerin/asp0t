@@ -13,22 +13,22 @@
 		<title>Agarspot</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="http://agarspot.com/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-		<noscript><link rel="stylesheet" href="http://agarspot.com/assets/css/noscript.css" /></noscript>
-		<link rel="stylesheet" type="text/css" href="http://agarspot.com/dist/sweetalert.css"/>
-		<script src="http://agarspot.com/dist/sweetalert.min.js"></script>
-		<script src="http://agarspot.com/assets/js/jquery.min.js"></script>
-		<script src="http://agarspot.com/assets/js/skel.min.js"></script>
-		<script src="http://agarspot.com/assets/js/util.js"></script>
-		<script src="http://agarspot.com/assets/js/main.js"></script>
-		<script src="http://agarspot.com/teamspeak/public.js"></script>
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+		<link rel="stylesheet" type="text/css" href="/dist/sweetalert.css"/>
+		<script src="/dist/sweetalert.min.js"></script>
+		<script src="/assets/js/jquery.min.js"></script>
+		<script src="/assets/js/skel.min.js"></script>
+		<script src="/assets/js/util.js"></script>
+		<script src="/assets/js/main.js"></script>
+		<script src="/teamspeak/public.js"></script>
 		<?php
 			if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true && $_SESSION['user']=='Romian') {
 		?>
-		<script src="http://agarspot.com/teamspeak/private.js"></script>
+		<script src="/teamspeak/private.js"></script>
 		<?php
 			}
 		?>
@@ -72,18 +72,13 @@
 						</div>
 						<nav>
 							<ul>
+								
+								<?php
+									if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true && $_SESSION['user']=='Romian') {
+								?>
 								<li><a href="#dns">Change Subdomain</a></li>
-								<?php
-									if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true && $_SESSION['user']=='Romian') {
-								?>
 								<li><a href="#managets" onclick="getServerList()">Manage Teamspeaks</a></li>
-								<?php
-									}
-								?>
 								<li><a href="#teamspeak">Create Teamspeak</a></li>
-								<?php
-									if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true && $_SESSION['user']=='Romian') {
-								?>
 								<li><a href="#tools">Tools</a></li>
 								<?php
 									}

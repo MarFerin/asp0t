@@ -33,18 +33,18 @@
 ?>
 <html>
 	<head>
-		<title>Agarspot</title>
+		<title>Teamspeak</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="http://agarspot.com/assets/css/main.css" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 		<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
 		<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
-		<noscript><link rel="stylesheet" href="http://agarspot.com/assets/css/noscript.css" /></noscript>
-		<script src="http://agarspot.com/assets/js/jquery.min.js"></script>
-			<script src="http://agarspot.com/assets/js/skel.min.js"></script>
-			<script src="http://agarspot.com/assets/js/util.js"></script>
-			<script src="http://agarspot.com/assets/js/main.js"></script>
+		<noscript><link rel="stylesheet" href="/assets/css/noscript.css" /></noscript>
+		<script src="/assets/js/jquery.min.js"></script>
+			<script src="/assets/js/skel.min.js"></script>
+			<script src="/assets/js/util.js"></script>
+			<script src="/assets/js/main.js"></script>
 			<style type="text/css">
 				#username {
 				    margin-bottom: 10px;

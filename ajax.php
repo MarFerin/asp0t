@@ -69,19 +69,17 @@ if (isset($_POST['updateTSDNS'])) {
 if (isset($_POST['manageTeamspeaks'])) {
     $receiveData = $_POST['manageTeamspeaks'];
     if($receiveData["Passkey"]=="aspot_89"){
-        $inipath = "/home/ts3srv/tsdns/tsdns_settings.ini";
-        $config_array  = parse_ini_file($inipath);
         $ts3_ServerInstance = TeamSpeak3::factory($query);
         $listofservers = array();
-        $serverList = $ts3_ServerInstance->serverList();
+        $serverList[] = $ts3_ServerInstance->serverGetByPort(9097);
+        $serverList[] = $ts3_ServerInstance->serverGetByPort(9055);
         foreach($serverList as $ts3_VirtualServer){
             $serverID = (string)$ts3_VirtualServer->virtualserver_id;
             $serverName = (string)$ts3_VirtualServer->virtualserver_name;
             $serverPort = (string)$ts3_VirtualServer->virtualserver_port;
             $serverSlots = (string)$ts3_VirtualServer->virtualserver_maxclients;
             $serverClients = (string)$ts3_VirtualServer->clientCount();
-            $subdomain = array_keys($config_array, '104.45.30.123:'.$serverPort);
-            $listofservers[$serverID]=array("Name"=>$serverName,"Subdomain"=>$subdomain,"Port"=>$serverPort,"Online"=>$serverClients,"Slots"=>$serverSlots);
+            $listofservers[$serverID]=array("Name"=>$serverName,"Port"=>$serverPort,"Online"=>$serverClients,"Slots"=>$serverSlots);
         }
         $ts3_ServerInstance->logout();
         $listofservers = array_values($listofservers);

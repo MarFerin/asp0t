@@ -28,7 +28,7 @@ function runAjaxQuery(){
     });
 }
 function viewTeamspeak(elem){
-    var port = elem.childNodes[0].rows[0].cells[1].innerHTML;
+    var port = elem.childNodes[0].rows[0].cells[2].innerHTML;
     var sendJson = {"Port":port, "Passkey":sensitivePass};
     $.ajax({
         type: "POST",
@@ -276,20 +276,12 @@ function getServerList(){
         data: {manageTeamspeaks:sendJson},
         success: function(data) {
             $('#managetsdiv').empty();
-            $('#managetsdiv').append('<table width=100% style="border-bottom:1px solid white"><tr><td style="font-weight:bold; width:13rem">'+
-                'Server Name</td><td style="width: 3rem; font-weight:bold">Port</td><td style="width: 3rem;'+
-                ' font-weight:bold">Slots</td><td style="font-weight:bold">'+
-                'Subdomain</td><td style="width: 4rem;font-weight:bold">Tools</td><tr></table>');
             for(i=0;i<data.length;i++){
                 $('#managetsdiv').append('<table id="'+data[i].Port+'" style="width: 100%; align-items: center; vertical-align: middle;'+
-                    ' border-bottom:1px solid #525252"><tr><td class="serverList" onclick="viewTeamspeak(this)" style="vertical-align: middle"><table>'+
+                    '"><tr><td class="serverList" onclick="viewTeamspeak(this)" style="vertical-align: middle"><table>'+
                     '<tr><td class="serverName">'+
-                    data[i].Name+'</td><td style="width: 3rem">'+data[i].Port+'</td><td style="width: 3rem">'+
-                    data[i].Online+'/'+data[i].Slots+'</td><td class="serverSubdomain">'+
-                    data[i].Subdomain[0]+'</td></tr></table></td><td><a href="ts3server://104.45.30.123:'+data[i].Port+'" class="tool icon fa-paper-plane"></a>'+
-                    '<a onclick="editts('+data[i].Port+')" class="tool icon fa-pencil"></a>'+
-                    '<a onclick="deletets('+data[i].Port+')" class="tool icon fa-trash"></a>'+
-                    '<a onclick="resetts('+data[i].Port+')" class="tool icon fa-refresh"></a>'+'</td></tr></table>');
+                    data[i].Name+'</td><td style="width: 6rem">'+data[i].Online+'/'+data[i].Slots+'</td><td style="width: 6rem;text-align: right;">'+
+                    data[i].Port+'</td></tr></table></td></tr></table>');
             }
         }
     });
