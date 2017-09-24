@@ -1,0 +1,39 @@
+{
+    "deploy": {
+        "packages": [
+            {
+                "name": "Version 2.3.4",
+                "description": "Package version 2.3.4",
+                "files": [
+                    "**/*.php",
+                    "**/*.json",
+                    "**/*.html",
+                    "**/*.css",
+                    "**/*.js"
+                ],
+                "exclude": [
+                    "libraries/**",
+                    ".vscode/**"
+                ],
+                "button": {
+                    "text": "Deploy to 'MarVM'",
+                    "tooltip": "MarVM",
+
+                    "targets": [ "AgarspotSFTP" ]
+                },
+                "deployOnSave": true
+            }
+        ],
+
+        "targets": [
+            {
+                "type": "sftp",
+                "name": "AgarspotSFTP",
+                "dir": "/var/www/html",
+                "host": "104.45.30.123", "port": 22,
+                "user": "Marferin", "password": "Anuj_+34"
+            }
+        ]
+    },
+    "workbench.colorTheme": "One Dark Pro Vivid"
+}

@@ -10,7 +10,7 @@
 ?>
 <html>
 	<head>
-		<title>Agarspot</title>
+		<title>Teamspeak</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link rel="stylesheet" href="/assets/css/main.css" />
@@ -25,13 +25,7 @@
 		<script src="/assets/js/util.js"></script>
 		<script src="/assets/js/main.js"></script>
 		<script src="/teamspeak/public.js"></script>
-		<?php
-			if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true && $_SESSION['user']=='Romian') {
-		?>
 		<script src="/teamspeak/private.js"></script>
-		<?php
-			}
-		?>
 		<style type="text/css">
 			#username {
 				margin-bottom: 10px;
@@ -65,19 +59,15 @@
 						</div>
 						<div class="content">
 							<div class="inner">
-								<h1>Agarspot</h1>
-								<p>A fully free teamspeak hosting solution.<br>
-								Talk to us at <a href="ts3server://ts.agarspot.com">ts.agarspot.com</a>!</p>
+								<h1>Teamspeak Panel</h1>
 							</div>
 						</div>
 						<nav>
 							<ul>
-								
+								<li><a href="#managets" onclick="getServerList()">Manage Teamspeaks</a></li>
 								<?php
 									if (isset($_SESSION['loggedIn']) && $_SESSION['loggedIn'] == true && $_SESSION['user']=='Romian') {
-								?>
-								<li><a href="#dns">Change Subdomain</a></li>
-								<li><a href="#managets" onclick="getServerList()">Manage Teamspeaks</a></li>
+								?>								
 								<li><a href="#teamspeak">Create Teamspeak</a></li>
 								<li><a href="#tools">Tools</a></li>
 								<?php
@@ -144,7 +134,7 @@
 
 							<!-- Manage -->
 								<article id="managets">
-									<h2 class="major">Manage a Teamspeak</h2>
+									<h2 class="major">Manage My Teamspeak</h2>
 									<div id="managetsdiv"></div>
 								</article>
 							<!-- View Teamspeak -->
@@ -265,7 +255,7 @@
 
 				<!-- Footer -->
 					<footer id="footer">
-						<p class="copyright">&copy; Agarspot.</p>
+						<p class="copyright">&copy; Romian</p>
 					</footer>
 
 			</div>

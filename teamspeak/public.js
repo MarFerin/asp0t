@@ -14,7 +14,7 @@ function create(){
             success: function(data) {
                 if(data["Error"]==0){
                     var dataRead = data["Response"];
-                    $('#url-to-copy').val('ts3server://'+dataRead["URL"]+'?token='+dataRead["token"]);
+                    $('#url-to-copy').val('ts3server://104.45.30.123:'+dataRead["Port"]+'?token='+dataRead["token"]);
                     $("#Connection").show();
                     $('#loading').hide();
                 }
@@ -59,6 +59,7 @@ function updateDNS(){
 }
 function validation(){
     var returnvalue = true;
+    return true;
     if($('#server-name').val()==""){
         document.getElementById("server-name").setCustomValidity("Invalid Name.");
         document.getElementById("nameError").innerHTML = "*Name cannot be empty.";
@@ -79,7 +80,7 @@ function validation(){
         document.getElementById("domainError").innerHTML = "*Subdomain too long.";
         returnvalue = false;
     }
-    return returnvalue;
+    //return returnvalue;
 }
 function evalidation(){
     var returnvalue = true;
@@ -114,7 +115,7 @@ function eclearValidity(){
     document.getElementById("edomainError").innerHTML = "";
 }
 function checkTSDNS(){
-    if($('#server-subdomain').val()==""){
+    /*if($('#server-subdomain').val()==""){
         document.getElementById("server-subdomain").setCustomValidity("Invalid Subdomain.");
         document.getElementById("domainError").innerHTML = "*Subdomain cannot be empty.";
         return 1;
@@ -140,7 +141,8 @@ function checkTSDNS(){
             }
             return data["Error"];
         }
-    });
+    });*/
+    return 0;
 }
 function echeckTSDNS(){
     if($('#eserver-subdomain').val()==""){

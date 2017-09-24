@@ -71,7 +71,7 @@ if (isset($_POST['manageTeamspeaks'])) {
     if($receiveData["Passkey"]=="aspot_89"){
         $ts3_ServerInstance = TeamSpeak3::factory($query);
         $listofservers = array();
-        $serverList[] = $ts3_ServerInstance->serverGetByPort(9097);
+        //$serverList[] = $ts3_ServerInstance->serverGetByPort(9097);
         $serverList[] = $ts3_ServerInstance->serverGetByPort(9055);
         foreach($serverList as $ts3_VirtualServer){
             $serverID = (string)$ts3_VirtualServer->virtualserver_id;
@@ -475,12 +475,6 @@ function createTeamspeak($teamspeakData) {
     if(strlen($teamspeakData["ServerName"])>30){
         return '{"Error":"1","Response":"Invalid Server Name"}';
     }
-    if(!is_valid_domain_name($teamspeakData["Subdomain"]) || strlen($teamspeakData["Subdomain"])>30){
-        return '{"Error":"2","Response":"Invalid Subdomain"}';
-    }
-    if(!checkIfValid($teamspeakData["Subdomain"],getDomain($teamspeakData["Domain"]))){
-        return '{"Error":"3","Response":"Subdomain Taken"}';
-    }
     if(!is_numeric($teamspeakData["Slots"]) || $teamspeakData["Slots"]>500){
         return '{"Error":"5","Response":"Too many slots"}';
     }
@@ -526,7 +520,7 @@ function createTeamspeak($teamspeakData) {
     }
     
     $ts3_VirtualServer->logout();
-    addTSDNS($teamspeakData["Subdomain"],getDomain($teamspeakData["Domain"]),$serverPort);
+    //addTSDNS($teamspeakData["Subdomain"],getDomain($teamspeakData["Domain"]),$serverPort);
     return '{"Error":"0","Response":{"URL":"'.$teamspeakData["Subdomain"].getDomain($teamspeakData["Domain"]).'","token":"'.$serverToken.'","port":"'.$serverPort.'"}}';
 }
 ?>
